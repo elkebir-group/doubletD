@@ -202,7 +202,7 @@ class doubletFinder():
 #            yprime = y - 4 * self.alpha * y + 3 * self.alpha
 #        else:
 #            yprime = y - 2 * self.alpha * y + self.alpha
-        yprime = self.alpha_fp + (1 - alpha_fp - alpha_fn) * y
+        yprime = self.alpha_fp + (1 - self.alpha_fp - self.alpha_fn) * y
         return nCr(r+v, v) * (yprime ** v) * ((1-yprime) ** r)
 
     def prv_y_bb(self, r, v, y):
@@ -210,9 +210,11 @@ class doubletFinder():
 #            yprime = y - 4 * self.alpha * y + 3 * self.alpha
 #        else:
 #            yprime = y - 2 * self.alpha * y + self.alpha
-        yprime = self.alpha_fp + (1 - alpha_fp - alpha_fn) * y
+        yprime = self.alpha_fp + (1 - self.alpha_fp - self.alpha_fn) * y
         if yprime == 0:
             yprime = 0.001
+        if yprime == 1:
+            yprime = 0.999
         alpha = self.precision*yprime 
         beta = self.precision - alpha
         n = r + v 
