@@ -15,7 +15,7 @@ import scipy.special as ss
 
 class doubletFinder():
 
-    def __init__(self, df_total, df_alt, delta, beta, mu_hetero, mu_homo, alpha, asym=False, all_imb=False, missing=False, verbose=True, cellcoal=False, binom=False, precision=10000, estimate=False):
+    def __init__(self, df_total, df_alt, delta, beta, mu_hetero, mu_homo, alpha_fp, alpha_fn, asym=False, all_imb=False, missing=False, verbose=True, cellcoal=False, binom=False, precision=10000, estimate=False):
 
         self.df_total = df_total
         self.df_alt = df_alt
@@ -23,7 +23,8 @@ class doubletFinder():
         self.beta = beta
         self.mu_hetero = mu_hetero
         self.mu_homo = mu_homo
-        self.alpha = alpha
+        self.alpha_fp = alpha_fp
+        self.alpha_fn = alpha_fn
         self.precision = precision
         self.asym = asym
         self.missing = missing
@@ -197,17 +198,19 @@ class doubletFinder():
         return log_prob_sum
 
     def prv_y_b(self, r, v, y):
-        if self.asym:
-            yprime = y - 4 * self.alpha * y + 3 * self.alpha
-        else:
-            yprime = y - 2 * self.alpha * y + self.alpha
+#        if self.asym:
+#            yprime = y - 4 * self.alpha * y + 3 * self.alpha
+#        else:
+#            yprime = y - 2 * self.alpha * y + self.alpha
+        yprime = self.alpha_fp + (1 - alpha_fp - alpha_fn) * y
         return nCr(r+v, v) * (yprime ** v) * ((1-yprime) ** r)
 
     def prv_y_bb(self, r, v, y):
-        if self.asym:
-            yprime = y - 4 * self.alpha * y + 3 * self.alpha
-        else:
-            yprime = y - 2 * self.alpha * y + self.alpha
+#        if self.asym:
+#            yprime = y - 4 * self.alpha * y + 3 * self.alpha
+#        else:
+#            yprime = y - 2 * self.alpha * y + self.alpha
+        yprime = self.alpha_fp + (1 - alpha_fp - alpha_fn) * y
         if yprime == 0:
             yprime = 0.001
         alpha = self.precision*yprime 
@@ -287,7 +290,7 @@ def main(args):
         print(f"number of mutation positions is {npos}")
 
     solver = doubletFinder(df_total, df_alt, delta = args.delta, beta = args.beta, all_imb = args.all_imb, missing = args.missing, 
-                           mu_hetero = args.mu_hetero, mu_homo = args.mu_homo, alpha = args.alpha, asym = args.asym,
+                           mu_hetero = args.mu_hetero, mu_homo = args.mu_homo, alpha_fp = args.alpha_fp, alpha_fn = args.alpha_fn, asym = args.asym,
                            verbose = args.verbose, cellcoal = args.cellcoal, binom = args.binom, precision = args.prec,
                            estimate = args.estimate)
 
@@ -313,7 +316,8 @@ if __name__ == "__main__":
     parser.add_argument("--beta", type=float, default=0.05, help="Allelic dropout (ADO) rate [0.05]")
     parser.add_argument("--mu_hetero", type=float, default=0.5, help="heterozygous mutation rate [0.5]")
     parser.add_argument("--mu_homo", type=float, default=0, help="homozygous mutation rate [0]")
-    parser.add_argument("--alpha", type=float, default = 0, help="sequencing error rate [0]")
+    parser.add_argument("--alpha_fp", type=float, default = 0, help="copy false positive error rate [0]")
+    parser.add_argument("--alpha_fn", type=float, default = 0, help="copy flase negative error rate [0]")
     parser.add_argument("-o", "--outputfile", type=str, help="output file name")
     parser.add_argument("--noverbose", dest="verbose", help="do not output statements from internal solvers [default is false]", action='store_false')
     parser.add_argument("--cellcoal", dest="cellcoal", help="use cellcoal doublet model [default is false]", action='store_true')
