@@ -1,246 +1,80 @@
-#configfile: "config.yaml"
 configfile: "sim.yaml"
 
 seeds = [ i+1 for i in range(config["nseeds"])]
 
-def calc_losses(nmuts, loss_rate):
-    return losses = (int) loss_rate* nmuts
 
 rule all:
     input:
-          #expand("prediction_tree/doubletD_BB/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_p{bprec}_prediction.out", seed=seeds, nmuts=config["nmuts"], nreads=config["nreads"], pdoublet=config["pdoublet"], eseq=config["eseq"], ado=config["ado"], bprec=config['bprec']),
-          #expand("read_counts_mb/" + config['simdir'] +"/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_p{bprec}_ad.csv",seed=seeds, nmuts=config["nmuts"], nreads=config["nreads"], pdoublet=config["pdoublet"], eseq=config["eseq"], ado=config["ado"], bprec=config['bprec']),
-          #expand("prediction_mb/" + config['preddir'] +"/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_p{bprec}_het{het}_loh{loh}_prediction.out",seed=seeds, nmuts=config["nmuts"], nreads=config["nreads"], pdoublet=config["pdoublet"], eseq=config["eseq"], ado=config["ado"], bprec=config['bprec'], het=config['het'], loh=config['loh'])
-          expand("prediction_mb/" + config['preddir'] +"/s{seed}/m{nmuts}_r{nreads}_d{tdoublet}_i{pdoublet}_e{eseq}_a{ado}_p{bprec}_prediction.out",seed=seeds, nmuts=config["nmuts"], nreads=config["nreads"],tdoublet=config["tdoublet"], pdoublet=config["pdoublet"], eseq=config["eseq"], ado=config["ado"], bprec=config['bprec'], losses=calc_losses(config["nmuts"], config["loss_rate"]))
-          #expand("doubletD_random/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_p{bprec}_prediction.out", seed=seeds, nmuts=config["nmuts"], nreads=config["nreads"], pdoublet=config["pdoublet"], eseq=config["eseq"], ado=config["ado"],bprec=config['bprec']),
-          #expand("doubletD_mb/doubletD_BB_random_asym_ado/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_p{bprec}_prediction.out",seed=seeds, nmuts=config["nmuts"], nreads=config["nreads"], pdoublet=config["pdoublet"], eseq=config["eseq"], ado=config["ado"],bprec=config['bprec']),
-          #expand("doubletD/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_prediction.out", seed=seeds, nmuts=config["nmuts"], nreads=config["nreads"], pdoublet=config["pdoublet"], eseq=config["eseq"], ado=config["ado"]),
-          #expand("doubletGrid/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_prediction.out",seed=seeds, nmuts=config["nmuts"], nreads=config["nreads"], pdoublet=config["pdoublet"], eseq=config["eseq"], ado=config["ado"])
-          #expand("sphyr/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_sphyr.out",seed=seeds, nmuts=config["nmuts"], nreads=config["nreads"], pdoublet=config["pdoublet"], eseq=config["eseq"], ado=config["ado"])
-          #expand("read_counts/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_ad.csv", seed=seeds, nmuts=config["nmuts"], nreads=config["nreads"], pdoublet=config["pdoublet"], eseq=config["eseq"], ado=config["ado"]),
-        #   expand("read_counts_random/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_p{bprec}_dp.csv", seed=seeds, nmuts=config["nmuts"], nreads=config["nreads"], pdoublet=config["pdoublet"], eseq=config["eseq"], ado=config["ado"],bprec=config['bprec']),
-        #   expand("read_counts_tree/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_p{bprec}_dp.csv", seed=seeds, nmuts=config["nmuts"], nreads=config["nreads"], pdoublet=config["pdoublet"], eseq=config["eseq"], ado=config["ado"],bprec=config['bprec']),
-rule simulate_random:
-    output:
-        ad_file = "read_counts_random/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_p{bprec}_ad.csv",
-        dp_file = "read_counts_random/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_p{bprec}_dp.csv",
-        doublet_file = "sim_aux_random/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_p{bprec}_doublets.csv",
-        genotype_file = "sim_aux_random/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_p{bprec}_genotypes.csv",
-        cellgenotype_file = "sim_aux_random/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_p{bprec}_cellgenotypes.csv",
-        binary_file = "sim_aux_random/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_p{bprec}_binary.csv",
-        zygosity_file = "sim_aux_random/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_p{bprec}_zygosity.csv",
-        param_file = "sim_aux_random/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_p{bprec}_param.csv",
-        prev_file = "sim_aux_random/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_p{bprec}_prev.csv",
-        clusters_file = "sim_aux_random/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_p{bprec}_clusters.csv",
-        dropout_file = "sim_aux_random/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_p{bprec}_dropouts.csv",
-    params:
-        nnodes = config["nnodes"],
-        ncells = config["ncells"],
-        hetero = config["hetero"],
-    log:
-        std = "sim_aux_random/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_p{bprec}.log", 
-        err = "sim_aux_random/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_p{bprec}.err.log" 
-    shell:
-        "./scsim -random True -params {output.param_file} -zygosity {output.zygosity_file} "
-        " -true_genotypes {output.genotype_file} -cell_genotypes {output.cellgenotype_file} -dropout {output.dropout_file} "
-        "-ad {output.ad_file} -dp {output.dp_file} -doublets {output.doublet_file} -scs {output.binary_file} "
-        " -clusters {output.clusters_file} -prev {output.prev_file} -s {wildcards.seed} -delta {wildcards.pdoublet} -depth {wildcards.nreads} "
-        " -fp {wildcards.eseq} -ado {wildcards.ado} -t {wildcards.nmuts} -n {params.nnodes} -exp {params.ncells} -het {params.hetero} -beta {wildcards.bprec} "
-        " > {log.std} 2> {log.err}"
+        expand( "read_counts/s{seed}/m{nmuts}_r{nreads}_d{tdoublet}_fp{alpha_fp}_fn{alph_fn}_a{ado}_p{bprec}_c{cna}_l{loss}_ad.csv",
+                  seed=seeds, 
+                  nmuts=config["nmuts"], 
+                  nreads=config["nreads"],
+                  tdoublet=config["tdoublet"], 
+                  alpha_fp=config["fp"], 
+                  alph_fn = config["fn"],
+                  ado=config["ado"], 
+                  bprec=config['bprec'], 
+                  loss= config["loss"], 
+                  cna=config["cna"])
+        # expand("prediction/doubletD/s{seed}/i{pdoublet}/m{nmuts}_r{nreads}_d{tdoublet}_fp{fp}_fn{fn}_a{ado}_p{bprec}_c{cna}_l{loss}_prediction.out",
+        #           seed=seeds, 
+        #           nmuts=config["nmuts"], 
+        #           nreads=config["nreads"],
+        #           tdoublet=config["tdoublet"], 
+        #           pdoublet=config["pdoublet"], 
+        #           fp=config["fp"], 
+        #           fn = config["fn"],
+        #           ado=config["ado"], 
+        #           bprec=config['bprec'], 
+        #           loss= config["loss"], 
+        #           cna=config["cna"])
+         
 
 rule simulate_tree:
     output:
-        ad_file = "read_counts_tree/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_p{bprec}_ad.csv",
-        dp_file = "read_counts_tree/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_p{bprec}_dp.csv",
-        doublet_file = "sim_aux_tree/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_p{bprec}_doublets.csv",
-        genotype_file = "sim_aux_tree/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_p{bprec}_genotypes.csv",
-        cellgenotype_file = "sim_aux_tree/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}__p{bprec}_cellgenotypes.csv",
-        binary_file = "sim_aux_tree/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_p{bprec}_binary.csv",
-        zygosity_file = "sim_aux_tree/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_p{bprec}_zygosity.csv",
-        tree_file = "sim_aux_tree/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_p{bprec}_tree.csv",
-        param_file = "sim_aux_tree/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_p{bprec}_param.csv",
-        prev_file = "sim_aux_tree/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_p{bprec}_prev.csv",
-        clusters_file = "sim_aux_tree/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_p{bprec}_clusters.csv",
+        ad_file = "read_counts/s{seed}/m{nmuts}_r{nreads}_d{tdoublet}_fp{alpha_fp}_fn{alpha_fn}_a{ado}_p{bprec}_c{cna}_l{loss}_ad.csv",
+        dp_file = "read_counts/s{seed}/m{nmuts}_r{nreads}_d{tdoublet}_fp{alpha_fp}_fn{alpha_fn}_a{ado}_p{bprec}_c{cna}_l{loss}_dp.csv",
+        doublet_file = "sim_aux/s{seed}/m{nmuts}_r{nreads}_d{tdoublet}_fp{alpha_fp}_fn{alpha_fn}_a{ado}_p{bprec}_c{cna}_l{loss}_doublets.csv",
+        mutalleles_file = "sim_aux/s{seed}/m{nmuts}_r{nreads}_d{tdoublet}_fp{alpha_fp}_fn{alpha_fn}_a{ado}_p{bprec}_c{cna}_l{loss}_mutAlleles.csv",
+        refalleles_file = "sim_aux/s{seed}/m{nmuts}_r{nreads}_d{tdoublet}_fp{alpha_fp}_fn{alpha_fn}_a{ado}_p{bprec}_c{cna}_l{loss}_refAlleles.csv",
+        cellgenotype_file = "sim_aux/s{seed}/m{nmuts}_r{nreads}_d{tdoublet}_fp{alpha_fp}_fn{alpha_fn}_a{ado}_p{bprec}_c{cna}_l{loss}_cellgenotypes.csv",
+        binary_file = "sim_aux/s{seed}/m{nmuts}_r{nreads}_d{tdoublet}_fp{alpha_fp}_fn{alpha_fn}_a{ado}_p{bprec}_c{cna}_l{loss}_binary.csv",
+        tree_file = "sim_aux/s{seed}/m{nmuts}_r{nreads}_d{tdoublet}_fp{alpha_fp}_fn{alpha_fn}_a{ado}_p{bprec}_c{cna}_l{loss}_tree.csv",
+        param_file = "sim_aux/s{seed}/m{nmuts}_r{nreads}_d{tdoublet}_fp{alpha_fp}_fn{alpha_fn}_a{ado}_p{bprec}_c{cna}_l{loss}_param.csv",
+        prev_file = "sim_aux/s{seed}/m{nmuts}_r{nreads}_d{tdoublet}_fp{alpha_fp}_fn{alpha_fn}_a{ado}_p{bprec}_c{cna}_l{loss}_prev.csv",
+        loh_file = "sim_aux/s{seed}/m{nmuts}_r{nreads}_d{tdoublet}_fp{alpha_fp}_fn{alpha_fn}_a{ado}_p{bprec}_c{cna}_l{loss}_loh.csv",
+        cnv_file = "sim_aux/s{seed}/m{nmuts}_r{nreads}_d{tdoublet}_fp{alpha_fp}_fn{alpha_fn}_a{ado}_p{bprec}_c{cna}_l{loss}_cna.csv",
+        clusters_file = "sim_aux/s{seed}/m{nmuts}_r{nreads}_d{tdoublet}_fp{alpha_fp}_fn{alpha_fn}_a{ado}_p{bprec}_c{cna}_l{loss}_clusters.csv",
     params:
         nnodes = config["nnodes"],
         ncells = config["ncells"],
         hetero = config["hetero"],
+        rare = config['rare']
     log:
-        std = "sim_aux_tree/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_p{bprec}.log", 
-        err = "sim_aux_tree/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_p{bprec}.err.log" 
+        std = "sim_aux/s{seed}/m{nmuts}_r{nreads}_d{tdoublet}_fp{alpha_fp}_fn{alpha_fn}_a{ado}_p{bprec}_c{cna}_l{loss}.log", 
+        err = "sim_aux/s{seed}/m{nmuts}_r{nreads}_d{tdoublet}_fp{alpha_fp}_fn{alpha_fn}_a{ado}_p{bprec}_c{cna}_l{loss}.err.log" 
     shell:
-        "./scsim -tree {output.tree_file} -params {output.param_file} -zygosity {output.zygosity_file} "
-        " -true_genotypes {output.genotype_file} -cell_genotypes {output.cellgenotype_file} "
-        "-ad {output.ad_file} -dp {output.dp_file} -doublets {output.doublet_file} -scs {output.binary_file} "
-        " -clusters {output.clusters_file} -prev {output.prev_file} -s {wildcards.seed} -delta {wildcards.pdoublet} -depth {wildcards.nreads} "
-        " -fp {wildcards.eseq} -ado {wildcards.ado} -t {wildcards.nmuts} -n {params.nnodes} -exp {params.ncells} -het {params.hetero} -beta {wildcards.bprec} "
+        "./scsim -tree {output.tree_file} -params {output.param_file}  "
+        " -mut-copies {output.mutalleles_file} -ref-copies {output.refalleles_file} -cell_genotypes {output.cellgenotype_file} -loh-file {output.loh_file} "
+        " -ad {output.ad_file} -dp {output.dp_file} -doublets {output.doublet_file} -scs {output.binary_file} -cnv-file {output.cnv_file} "
+        " -clusters {output.clusters_file} -prev {output.prev_file} -s {wildcards.seed} -delta {wildcards.tdoublet} -depth {wildcards.nreads} "
+        " -alpha-fp {wildcards.alpha_fp} -alpha-fn {wildcards.alpha_fn} -ado {wildcards.ado} -t {wildcards.nmuts} -n {params.nnodes} -exp {params.ncells} -het {params.hetero} -beta {wildcards.bprec} "
+        " -cna-rate {wildcards.cna} -loss-rate {wildcards.loss} -copy-error -rare-thresh {params.rare} "
         " > {log.std} 2> {log.err}"
 
-rule detectDoublets_random:
-    input:
-        ad_file = "read_counts_random/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_p{bprec}_ad.csv",
-        dp_file = "read_counts_random/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_p{bprec}_dp.csv",
-    output: 
-        outfile ="doubletD_random/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_p{bprec}_prediction.out",
-    benchmark: "doubletD_random/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_p{bprec}_benchmark.log" 
-    log: 
-        std = "doubletD_random/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_p{bprec}.log",
-        err = "doubletD_random/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_p{bprec}.err.log" 
-    shell:
-        "python doublet.py --inputTotal {input.dp_file} --inputAlternate {input.ad_file}  "
-        " --delta {wildcards.pdoublet} --beta {wildcards.ado} --alpha {wildcards.eseq} -o {output.outfile} "
-        " > {log.std} 2> {log.err}"
-
-# rule detectDoublets_mb:
-#     input:
-#         ad_file = "read_counts_mb/" + config['simdir'] +"/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_p{bprec}_ad.csv",
-#         dp_file = "read_counts_mb/" + config['simdir'] + "/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_p{bprec}_dp.csv",
-#     output: 
-#         outfile ="prediction_mb/" + config['preddir'] +"/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_p{bprec}_het{het}_loh{loh}_prediction.out",
-#     benchmark: "prediction_mb/" + config['preddir'] +"/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_p{bprec}_het{het}_loh{loh}_benchmark.log" 
-#     log: 
-#         std = "prediction_mb/" + config['preddir'] +"/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_p{bprec}_het{het}_loh{loh}.log",
-#         err = "prediction_mb/" + config['preddir'] +"/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_p{bprec}_het{het}_loh{loh}.err.log" 
-#     shell:
-#         "python doublet.py --inputTotal {input.dp_file} --inputAlternate {input.ad_file} --prec {wildcards.bprec} "
-#         " --delta {wildcards.pdoublet} --beta {wildcards.ado} --alpha {wildcards.eseq} -o {output.outfile} "
-#         " --mu_hetero {wildcards.het} --mu_homo {wildcards.loh} "
-#         " --missing --cellcoal --asym --allelic-imbalance > {log.std} 2> {log.err}"
-
-
-rule detectDoublets_mb_estimate:
-    input:
-        ad_file = "read_counts_mb/" + config['simdir'] +"/s{seed}/m{nmuts}_r{nreads}_d{tdoublet}_e{eseq}_a{ado}_p{bprec}_ad.csv",
-        dp_file = "read_counts_mb/" + config['simdir'] + "/s{seed}/m{nmuts}_r{nreads}_d{tdoublet}_e{eseq}_a{ado}_p{bprec}_dp.csv",
-    output: 
-        outfile ="prediction_mb/" + config['preddir'] +"/s{seed}/m{nmuts}_r{nreads}_d{tdoublet}_i{pdoublet}_e{eseq}_a{ado}_p{bprec}_prediction.out",
-    benchmark: "prediction_mb/" + config['preddir'] +"/s{seed}/m{nmuts}_r{nreads}_d{tdoublet}_i{pdoublet}_e{eseq}_a{ado}_p{bprec}_benchmark.log" 
-    log: 
-        std = "prediction_mb/" + config['preddir'] +"/s{seed}/m{nmuts}_r{nreads}_d{tdoublet}_i{pdoublet}_e{eseq}_a{ado}_p{bprec}.log",
-        err = "prediction_mb/" + config['preddir'] +"/s{seed}/m{nmuts}_r{nreads}_d{tdoublet}_i{pdoublet}_e{eseq}_a{ado}_p{bprec}.err.log" 
-    shell:
-        "python doublet.py --inputTotal {input.dp_file} --inputAlternate {input.ad_file} --prec {wildcards.bprec} "
-        " --delta {wildcards.pdoublet} --beta {wildcards.ado} --alpha {wildcards.eseq} -o {output.outfile} "
-        " --estimate "
-        " --missing --cellcoal --asym  > {log.std} 2> {log.err}"
-
-# rule detectDoubletsBB:
-#     input:
-#         ad_file = "read_counts_random_mb/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_p{bprec}_ad.csv",
-#         dp_file = "read_counts_random_mb/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_p{bprec}_dp.csv",
-#     output: 
-#         outfile ="doubletD_/doubletD_BB_random_asym_ado/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_p{bprec}_prediction.out",
-#     benchmark: "doubletD_mb/doubletD_BB_random_asym_ado/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_p{bprec}_benchmark.log" 
-#     log: 
-#         std = "doubletD_mb/doubletD_BB_random_asym_ado/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_p{bprec}.log",
-#         err = "doubletD/doubletD_BB_random_asym_ado/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_p{bprec}.err.log" 
-#     shell:
-#         "python doublet.py --inputTotal {input.dp_file} --inputAlternate {input.ad_file}  "
-#         " --delta {wildcards.pdoublet} --beta {wildcards.ado} --alpha {wildcards.eseq} --prec {wildcards.bprec} -o {output.outfile} "
-#         " --asym --cellcoal > {log.std} 2> {log.err}"
-
-rule simulate_mb:
-    output:
-        ad_file = "read_counts_mb/" + config['simdir'] +"/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_p{bprec}_ad.csv",
-        dp_file = "read_counts_mb/" + config['simdir'] +"/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_p{bprec}_dp.csv",
-        doublet_file = "sim_aux_mb/" + config['simdir'] +"/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_p{bprec}_doublets.csv",
-        genotype_file = "sim_aux_mb/" + config['simdir'] +"/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_p{bprec}_genotypes.csv",
-        cellgenotype_file = "sim_aux_mb/" + config['simdir'] +"/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_p{bprec}_cellgenotypes.csv",
-        binary_file = "sim_aux_mb/" + config['simdir'] +"/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_p{bprec}_binary.csv",
-        zygosity_file = "sim_aux_mb/" + config['simdir'] +"/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_p{bprec}_zygosity.csv",
-        param_file = "sim_aux_mb/" + config['simdir'] +"/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_p{bprec}_param.csv",
-        prev_file = "sim_aux_mb/" + config['simdir'] +"/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_p{bprec}_prev.csv",
-        clusters_file = "sim_aux_mb/" + config['simdir'] +"/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_p{bprec}_clusters.csv",
-        dropout_file = "sim_aux_mb/" + config['simdir'] +"/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_p{bprec}_dropouts.csv",
-    params:
-        nnodes = config["nnodes"],
-        ncells = config["ncells"],
-        hetero = config["hetero"],
-    log:
-        std = "sim_aux_random/" + config['simdir'] +"/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_p{bprec}.log", 
-        err = "sim_aux_random/" + config['simdir'] +"/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_p{bprec}.err.log" 
-    shell:
-        "./scsim -random -uniform -params {output.param_file} -zygosity {output.zygosity_file} "
-        " -true_genotypes {output.genotype_file} -cell_genotypes {output.cellgenotype_file} -dropout {output.dropout_file} "
-        "-ad {output.ad_file} -dp {output.dp_file} -doublets {output.doublet_file} -scs {output.binary_file} "
-        " -clusters {output.clusters_file} -prev {output.prev_file} -s {wildcards.seed} -delta {wildcards.pdoublet} -depth {wildcards.nreads} "
-        " -fp {wildcards.eseq} -ado {wildcards.ado} -t {wildcards.nmuts} -n {params.nnodes} -exp {params.ncells} -het {params.hetero} -beta {wildcards.bprec} "
-        " -asym > {log.std} 2> {log.err}"
-
-rule detectDoublets_tree:
-    input:
-        ad_file = "read_counts_tree/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_p{bprec}_ad.csv",
-        dp_file = "read_counts_tree/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_p{bprec}_dp.csv",
-    output: 
-        outfile ="prediction_tree/doubletD_BB/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_p{bprec}_prediction.out",
-    benchmark: "prediction_tree/doubletD_BB/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_p{bprec}_benchmark.log" 
-    log: 
-        std = "prediction_tree/doubletD_BB/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_p{bprec}.log",
-        err = "prediction_tree/doubletD_BB/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_p{bprec}.err.log" 
-    shell:
-        "python doublet.py --inputTotal {input.dp_file} --inputAlternate {input.ad_file}  "
-        " --delta {wildcards.pdoublet} --beta {wildcards.ado} --alpha {wildcards.eseq} -o {output.outfile} --prec {wildcards.bprec} "
-        " --cellcoal > {log.std} 2> {log.err}"
 
 rule detectDoublets:
     input:
-        ad_file = "read_counts/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_ad.csv",
-        dp_file = "read_counts/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_dp.csv",
+        ad_file = "read_counts/s{seed}/m{nmuts}_r{nreads}_d{tdoublet}_fp{alpha_fp}_fn{alpha_fn}_a{ado}_p{bprec}_c{cna}_l{loss}_ad.csv",
+        dp_file = "read_counts/s{seed}/m{nmuts}_r{nreads}_d{tdoublet}_fp{alpha_fp}_fn{alpha_fn}_a{ado}_p{bprec}_c{cna}_l{loss}_dp.csv",
     output: 
-        outfile ="doubletD/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_prediction.out",
-    benchmark: "doubletD/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_benchmark.log" 
+        outfile ="prediction/doubletD/s{seed}/i{pdoublet}/m{nmuts}_r{nreads}_d{tdoublet}_fp{alpha_fp}_fn{alpha_fn}_a{ado}_p{bprec}_c{cna}_l{loss}_prediction.out",
+    benchmark: "prediction/doubletD/s{seed}/i{pdoublet}/m{nmuts}_r{nreads}_d{tdoublet}_fp{alpha_fp}_fn{alpha_fn}_a{ado}_p{bprec}_c{cna}_l{loss}_benchmark.log" 
     log: 
-        std = "doubletD/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}.log",
-        err = "doubletD/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}.err.log" 
+        std = "prediction/doubletD/s{seed}/i{pdoublet}/m{nmuts}_r{nreads}_d{tdoublet}_fp{alpha_fp}_fn{alpha_fn}_a{ado}_p{bprec}_c{cna}_l{loss}.log",
+        err = "prediction/doubletD/s{seed}/i{pdoublet}/m{nmuts}_r{nreads}_d{tdoublet}_fp{alpha_fp}_fn{alpha_fn}_a{ado}_p{bprec}_c{cna}_l{loss}.err.log" 
     shell:
-        "python doublet.py --inputTotal {input.dp_file} --inputAlternate {input.ad_file}  "
-        " --delta {wildcards.pdoublet} --beta {wildcards.ado} --alpha {wildcards.eseq} -o {output.outfile} "
-        " > {log.std} 2> {log.err}"
-
-
-rule detectParameters:
-    input:
-        ad_file = "read_counts/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_ad.csv",
-        dp_file = "read_counts/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_dp.csv",
-    output: 
-        outfile ="doubletGrid/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_prediction.out",
-        posteriorfile = "doubletGrid/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_posterior.out",
-    benchmark: "doubletGrid/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_benchmark.log" 
-    params:
-        dshape1 = config['delta_shape1'],
-        dshape2 = config['delta_shape2'],
-        bshape1 = config['beta_shape1'],
-        bshape2 = config['beta_shape2']
-    log: 
-        std = "doubletGrid/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}.log",
-        err = "doubletGrid/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}.err.log" 
-    shell:
-        "python doubletgrid.py --inputTotal {input.dp_file} --inputAlternate {input.ad_file}  "
-        " --delta_shape1 {params.dshape1} --delta_shape2 {params.dshape2} --beta_shape1 {params.bshape1} "
-        " --beta_shape2 {params.bshape2} -alpha {wildcards.eseq} "
-        " --posterior_file {output.posteriorfile} "
-        " -o {output.outfile} "
-        " > {log.std} 2> {log.err}"
-
-
-rule converttoSphyr:
-    input: "sim_aux/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_binary.csv"
-
-    output: "sim_aux/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_sphyr.in"
-
-    script:
-        "convert_to_sphyr.py"
-
-#Sphyr cannot be run with error rates of 0 for fp and fn, ensure ado=0 cases are excluded
-#before running this rule
-rule runSphyr:
-    input: "sim_aux/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_sphyr.in"
-
-    output: "sphyr/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}_sphyr.out"
-    log: 
-        std = "sphyr/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}.log",
-        err = "sphyr/s{seed}/m{nmuts}_r{nreads}_d{pdoublet}_e{eseq}_a{ado}.err.log" 
-    shell:
-        "/scratch/projects/scsexp/SPhyR/build/kDPFC {input} {output} "
-        " -a {wildcards.eseq} -b {wildcards.ado} -k 0  -s {wildcards.seed} -N 3 "
-        " > {log.std} 2> {log.err}"
+        "python ../scripts/doublet.py --inputTotal {input.dp_file} --inputAlternate {input.ad_file}  "
+        " --delta {wildcards.pdoublet} --beta {wildcards.ado} -o {output.outfile} "
+        " --prec {wildcards.bprec} --alpha_fp {wildcards.alpha_fp} --alpha_fn {wildcards.alpha_fn}"
+        " --estimate --missing --cellcoal > {log.std} 2> {log.err}"

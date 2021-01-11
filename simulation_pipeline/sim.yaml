@@ -7,62 +7,36 @@ ncells:
 nseeds: 5
 
 
-eseq:
-    - 0.001
-
-preddir: 'doubletD_BB_est_mg'
-simdir: 'mb_random'
-#hetero: 0.9
 hetero: 
-    - 0.8
     - 0.9
-    - 1.0
 
 
 nreads:
     - 10
-    - 50
     - 100
 
 
-
-
-# het:
-#     - 0.7
-#     - 0.8
-#     - 0.9
-#     - 1.0
-
-# loh:
-#     - 0
-#     - 0.1
-#     - 0.2
-#     - 0.3
-#     - 0.4
-    
-
 nmuts:
     - 10
-    - 25
     - 50
     - 100
 
 cna:
     - 0.0
     - 0.1
-    - 0.3
     - 0.5
-    - 0.9
 
-losses:
-    - 0
-    - 3
-    - 5
+loss:
+    - 0.5
+    - 1.0
+# loss:
+#     - 0.0
+#     - 0.1
+#     - 0.3
 
 ado:
     - 0.0
     - 0.05
-    - 0.15
     - 0.25
 
 tdoublet:
@@ -71,31 +45,38 @@ tdoublet:
     - 0.2
     - 0.4
 
+bprec:
+    - 10
+    - 1000
 
 
+fp:
+    - 0.03
+
+fn:
+    - 0.015
+
+rare:
+    - 0.05
+
+
+    #inference parameters
 pdoublet:
     - 0.01
     - 0.05
     - 0.10
     - 0.2
-    - 0.3
     - 0.4
-    - 0.5
+    - 0.6
     - 0.9
 
+# #copy error
+# #mission bio values
+# wt_mean: 0.0319051
+# wt_prec: 2.381157
 
 
-#copy error
-#mission bio values
-wt_mean: 0.0319051
-wt_prec: 2.381157
 
-
-bprec:
-    - 10
-    - 50
-    - 100
-    - 10000
 
 
 
