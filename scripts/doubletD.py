@@ -46,34 +46,38 @@ class doubletFinder():
         self.Theta = ((0, 1/2, 1), (0, 1/4, 1/3, 1/2, 2/3, 3/4, 1))
 
         self.px_z = {x: 0 for z in [0,1] for x in itertools.product(self.muts, self.Sigma[z], [z])}
-        if estimate:
+        
             
-            for m in self.muts:
-                if estimate:
-                
-                    reads = self.df_alt[m]
-                    total = self.df_total[m]
-                    vaf = pd.DataFrame(reads/total)
-                
-                    loh_cells = (1-self.beta)*vaf.loc[vaf[m] > 0.85]
-                    wt_cells = (1-self.beta)*vaf.loc[vaf[m] < 0.15]
+        for m in self.muts:
+            if estimate:
+            
+                reads = self.df_alt[m]
+                total = self.df_total[m]
+                vaf = pd.DataFrame(reads/total)
+            
+                # loh_cells = (1-self.beta)*vaf.loc[vaf[m] > 0.85]
+                # wt_cells = (1-self.beta)*vaf.loc[vaf[m] < 0.15]
 
-                    #count the total number of non-na VAF cells for variant m
-                    non_na_cells =  len(self.cells) -vaf[m].isna().sum()
+                loh_cells = vaf.loc[vaf[m] > 0.8]
+                wt_cells =  vaf.loc[vaf[m] < 0.2]
+                het_cells = vaf.loc[(vaf[m] >= 0.4 )& (vaf[m] <= 0.6)]
                 
-                    est_wt_rate = wt_cells.shape[0]/non_na_cells
-                    est_loh_rate = loh_cells.shape[0]/non_na_cells
-                    
-                    #print(f"variant:{m} wt:{est_wt_rate} het:{1-est_wt_rate - est_loh_rate} loh:{est_loh_rate}")
-                    self.px_z[m, 0,0] = est_wt_rate
-                    self.px_z[m, 1/2,0] =  1 -est_wt_rate - est_loh_rate
-                    self.px_z[m, 1, 0] = est_loh_rate
+                #count the total number of non-na VAF cells for variant m
+                non_na_cells =  loh_cells.shape[0] + wt_cells.shape[0] + het_cells.shape[0]
+            
+                est_wt_rate = wt_cells.shape[0]/non_na_cells
+                est_loh_rate = loh_cells.shape[0]/non_na_cells
+                est_het_rate = het_cells.shape[0]/non_na_cells
+                #print(f"mut:{m} het:{est_het_rate} loh:{est_loh_rate} wt:{est_wt_rate}")
+                self.px_z[m, 0,0] = est_wt_rate
+                self.px_z[m, 1/2,0] =  est_het_rate
+                self.px_z[m, 1, 0] = est_loh_rate
 
 
-                else:
-                    self.px_z[m, 0,0] = 1 - self.mu_homo - self.mu_hetero
-                    self.px_z[m, 1/2,0] =  self.mu_hetero
-                    self.px_z[m, 1, 0] = self.mu_homo
+            else:
+                self.px_z[m, 0,0] = 1 - self.mu_homo - self.mu_hetero
+                self.px_z[m, 1/2,0] =  self.mu_hetero
+                self.px_z[m, 1, 0] = self.mu_homo
             
 
         norm_const = {}
