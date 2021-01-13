@@ -11,8 +11,13 @@ hetero:
     - 0.9
 
 
+nbdisp:
+    - 5
+
+
 nreads:
     - 10
+    - 50
     - 100
 
 
@@ -29,10 +34,7 @@ cna:
 loss:
     - 0.5
     - 1.0
-# loss:
-#     - 0.0
-#     - 0.1
-#     - 0.3
+
 
 ado:
     - 0.0
@@ -40,35 +42,29 @@ ado:
     - 0.25
 
 tdoublet:
-    - 0.0
+    # - 0.0
     - 0.1
     - 0.2
     - 0.4
 
 bprec:
-    - 10
+    - 15
     - 1000
 
-
+#https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4138190/
 fp:
-    - 0.03
+    - 0.001
 
 fn:
-    - 0.015
+    - 0.001
 
 rare:
     - 0.05
 
+#sensitivity analysis parameters
 
-    #inference parameters
-pdoublet:
-    - 0.01
-    - 0.05
-    - 0.10
-    - 0.2
-    - 0.4
-    - 0.6
-    - 0.9
+
+
 
 # #copy error
 # #mission bio values

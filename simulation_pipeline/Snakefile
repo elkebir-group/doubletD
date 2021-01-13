@@ -15,19 +15,29 @@ rule all:
                   ado=config["ado"], 
                   bprec=config['bprec'], 
                   loss= config["loss"], 
+                  cna=config["cna"]),
+        expand("prediction/doubletD/s{seed}/i{tdoublet}/m{nmuts}_r{nreads}_d{tdoublet}_fp{alpha_fp}_fn{alpha_fn}_a{ado}_p{bprec}_c{cna}_l{loss}_prediction.out",
+                  seed=seeds, 
+                  nmuts=config["nmuts"], 
+                  nreads=config["nreads"],
+                  tdoublet=config["tdoublet"], 
+                  alpha_fp=config["fp"], 
+                  alpha_fn = config["fn"],
+                  ado=config["ado"], 
+                  bprec=config['bprec'], 
+                  loss= config["loss"], 
+                  cna=config["cna"]),
+        expand("prediction/scrublet/s{seed}/i{tdoublet}/m{nmuts}_r{nreads}_d{tdoublet}_fp{alpha_fp}_fn{alpha_fn}_a{ado}_p{bprec}_c{cna}_l{loss}_prediction.out",
+                  seed=seeds, 
+                  nmuts=config["nmuts"], 
+                  nreads=config["nreads"],
+                  tdoublet=config["tdoublet"], 
+                  alpha_fp=config["fp"], 
+                  alpha_fn = config["fn"],
+                  ado=config["ado"], 
+                  bprec=config['bprec'], 
+                  loss= config["loss"], 
                   cna=config["cna"])
-        # expand("prediction/doubletD/s{seed}/i{pdoublet}/m{nmuts}_r{nreads}_d{tdoublet}_fp{fp}_fn{fn}_a{ado}_p{bprec}_c{cna}_l{loss}_prediction.out",
-        #           seed=seeds, 
-        #           nmuts=config["nmuts"], 
-        #           nreads=config["nreads"],
-        #           tdoublet=config["tdoublet"], 
-        #           pdoublet=config["pdoublet"], 
-        #           fp=config["fp"], 
-        #           fn = config["fn"],
-        #           ado=config["ado"], 
-        #           bprec=config['bprec'], 
-        #           loss= config["loss"], 
-        #           cna=config["cna"])
          
 
 rule simulate_tree:
@@ -49,7 +59,8 @@ rule simulate_tree:
         nnodes = config["nnodes"],
         ncells = config["ncells"],
         hetero = config["hetero"],
-        rare = config['rare']
+        rare = config['rare'],
+        nbdisp = config['nbdisp'],
     log:
         std = "sim_aux/s{seed}/m{nmuts}_r{nreads}_d{tdoublet}_fp{alpha_fp}_fn{alpha_fn}_a{ado}_p{bprec}_c{cna}_l{loss}.log", 
         err = "sim_aux/s{seed}/m{nmuts}_r{nreads}_d{tdoublet}_fp{alpha_fp}_fn{alpha_fn}_a{ado}_p{bprec}_c{cna}_l{loss}.err.log" 
@@ -59,7 +70,8 @@ rule simulate_tree:
         " -ad {output.ad_file} -dp {output.dp_file} -doublets {output.doublet_file} -scs {output.binary_file} -cnv-file {output.cnv_file} "
         " -clusters {output.clusters_file} -prev {output.prev_file} -s {wildcards.seed} -delta {wildcards.tdoublet} -depth {wildcards.nreads} "
         " -alpha-fp {wildcards.alpha_fp} -alpha-fn {wildcards.alpha_fn} -ado {wildcards.ado} -t {wildcards.nmuts} -n {params.nnodes} -exp {params.ncells} -het {params.hetero} -beta {wildcards.bprec} "
-        " -cna-rate {wildcards.cna} -loss-rate {wildcards.loss} -copy-error -rare-thresh {params.rare} "
+        " -cna-rate {wildcards.cna} -loss-rate {wildcards.loss} -copy-error "
+        " -rare-thresh {params.rare} -nbdispersion {params.nbdisp} "
         " > {log.std} 2> {log.err}"
 
 
@@ -68,13 +80,30 @@ rule detectDoublets:
         ad_file = "read_counts/s{seed}/m{nmuts}_r{nreads}_d{tdoublet}_fp{alpha_fp}_fn{alpha_fn}_a{ado}_p{bprec}_c{cna}_l{loss}_ad.csv",
         dp_file = "read_counts/s{seed}/m{nmuts}_r{nreads}_d{tdoublet}_fp{alpha_fp}_fn{alpha_fn}_a{ado}_p{bprec}_c{cna}_l{loss}_dp.csv",
     output: 
-        outfile ="prediction/doubletD/s{seed}/i{pdoublet}/m{nmuts}_r{nreads}_d{tdoublet}_fp{alpha_fp}_fn{alpha_fn}_a{ado}_p{bprec}_c{cna}_l{loss}_prediction.out",
-    benchmark: "prediction/doubletD/s{seed}/i{pdoublet}/m{nmuts}_r{nreads}_d{tdoublet}_fp{alpha_fp}_fn{alpha_fn}_a{ado}_p{bprec}_c{cna}_l{loss}_benchmark.log" 
+        outfile ="prediction/doubletD/s{seed}/i{tdoublet}/m{nmuts}_r{nreads}_d{tdoublet}_fp{alpha_fp}_fn{alpha_fn}_a{ado}_p{bprec}_c{cna}_l{loss}_prediction.out",
+    benchmark: "prediction/doubletD/s{seed}/i{tdoublet}/m{nmuts}_r{nreads}_d{tdoublet}_fp{alpha_fp}_fn{alpha_fn}_a{ado}_p{bprec}_c{cna}_l{loss}_benchmark.log" 
     log: 
-        std = "prediction/doubletD/s{seed}/i{pdoublet}/m{nmuts}_r{nreads}_d{tdoublet}_fp{alpha_fp}_fn{alpha_fn}_a{ado}_p{bprec}_c{cna}_l{loss}.log",
-        err = "prediction/doubletD/s{seed}/i{pdoublet}/m{nmuts}_r{nreads}_d{tdoublet}_fp{alpha_fp}_fn{alpha_fn}_a{ado}_p{bprec}_c{cna}_l{loss}.err.log" 
+        std = "prediction/doubletD/s{seed}/i{tdoublet}/m{nmuts}_r{nreads}_d{tdoublet}_fp{alpha_fp}_fn{alpha_fn}_a{ado}_p{bprec}_c{cna}_l{loss}.log",
+        err = "prediction/doubletD/s{seed}/i{tdoublet}/m{nmuts}_r{nreads}_d{tdoublet}_fp{alpha_fp}_fn{alpha_fn}_a{ado}_p{bprec}_c{cna}_l{loss}.err.log" 
     shell:
-        "python ../scripts/doublet.py --inputTotal {input.dp_file} --inputAlternate {input.ad_file}  "
-        " --delta {wildcards.pdoublet} --beta {wildcards.ado} -o {output.outfile} "
-        " --prec {wildcards.bprec} --alpha_fp {wildcards.alpha_fp} --alpha_fn {wildcards.alpha_fn}"
-        " --estimate --missing --cellcoal > {log.std} 2> {log.err}"
+        "python ../scripts/doubletD.py --inputTotal {input.dp_file} --inputAlternate {input.ad_file}  "
+        " --delta {wildcards.tdoublet} --beta {wildcards.ado} -o {output.outfile} "
+        " --prec {wildcards.bprec} --alpha_fp {wildcards.alpha_fp} --alpha_fn {wildcards.alpha_fn} "
+        " --estimate --cellcoal --missing > {log.std} 2> {log.err}"
+
+
+rule scrublet:
+    input:
+        ad_file = "read_counts/s{seed}/m{nmuts}_r{nreads}_d{tdoublet}_fp{alpha_fp}_fn{alpha_fn}_a{ado}_p{bprec}_c{cna}_l{loss}_ad.csv",
+        dp_file = "read_counts/s{seed}/m{nmuts}_r{nreads}_d{tdoublet}_fp{alpha_fp}_fn{alpha_fn}_a{ado}_p{bprec}_c{cna}_l{loss}_dp.csv",
+    output: 
+        outfile ="prediction/scrublet/s{seed}/i{tdoublet}/m{nmuts}_r{nreads}_d{tdoublet}_fp{alpha_fp}_fn{alpha_fn}_a{ado}_p{bprec}_c{cna}_l{loss}_prediction.out",
+    benchmark: "prediction/doubletD/s{seed}/i{tdoublet}/m{nmuts}_r{nreads}_d{tdoublet}_fp{alpha_fp}_fn{alpha_fn}_a{ado}_p{bprec}_c{cna}_l{loss}_benchmark.log" 
+    log: 
+        std = "prediction/scrublet/s{seed}/i{tdoublet}/m{nmuts}_r{nreads}_d{tdoublet}_fp{alpha_fp}_fn{alpha_fn}_a{ado}_p{bprec}_c{cna}_l{loss}.log",
+        err = "prediction/scrublet/s{seed}/i{tdoublet}/m{nmuts}_r{nreads}_d{tdoublet}_fp{alpha_fp}_fn{alpha_fn}_a{ado}_p{bprec}_c{cna}_l{loss}.err.log" 
+    shell:    
+        "python scrublet_benchmark.py --inputAlternate {input.ad_file} --inputTotal {input.dp_file} "
+        " --delta {wildcards.tdoublet} -o {output.outfile} "
+        " > {log.std} 2> {log.err}"
+
