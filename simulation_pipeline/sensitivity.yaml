@@ -1,46 +1,32 @@
 # simulation parameters
 nnodes: 10
 
-ncells: 
-    - 500
+ncells:  500
 
 nseeds: 5
 
 
-hetero: 
-    - 0.9
+hetero: 0.9
 
 
-nbdisp:
-    - 5
+nbdisp: 5
 
 
-nreads:
-    - 10
-    - 50
-    - 100
+nreads: 50
 
 
-nmuts:
-    - 10
-    - 50
-    - 100
 
-cna:
-    - 0.0
-    - 0.1
-    - 0.5
+nmuts: 50
 
-cna_ext: 1.0
-loss_ext: 0.0
 
-loss:
-    - 0.5
-    - 1.0
+cna: 0.0
+
+
+loss: 0.5
+
 
 
 ado:
-    - 0.0
     - 0.05
     - 0.25
 
@@ -54,6 +40,13 @@ bprec:
     - 15
     - 1000
 
+
+# pprec:
+#     - 7.5
+#     - 30
+#     - 500
+#     - 2000
+
 #https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4138190/
 fp:
     - 0.001
@@ -64,10 +57,16 @@ fn:
 rare:
     - 0.05
 
-#sensitivity analysis parameters
 
 
-
+ #inference parameters
+pdoublet:
+    - 0.01
+    - 0.10
+    - 0.2
+    - 0.4
+    - 0.7
+    - 0.9
 
 # #copy error
 # #mission bio values
