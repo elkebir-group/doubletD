@@ -46,9 +46,9 @@ ado:
 
 tdoublet:
     # - 0.0
-    - 0.1
+    # - 0.1
     - 0.2
-    - 0.4
+    # - 0.4
 
 bprec:
     - 15
@@ -63,6 +63,9 @@ fn:
 
 rare:
     - 0.05
+
+pval:
+    - 0.000001
 
 #sensitivity analysis parameters
 
