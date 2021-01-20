@@ -61,6 +61,7 @@ rule simulate_tree:
         hetero = config["hetero"],
         rare = config['rare'],
         nbdisp = config['nbdisp'],
+        max_add_copies = 5
     log:
         std = "sim_aux/s{seed}/m{nmuts}_r{nreads}_d{tdoublet}_fp{alpha_fp}_fn{alpha_fn}_a{ado}_p{bprec}_c{cna}_l{loss}.log", 
         err = "sim_aux/s{seed}/m{nmuts}_r{nreads}_d{tdoublet}_fp{alpha_fp}_fn{alpha_fn}_a{ado}_p{bprec}_c{cna}_l{loss}.err.log" 
@@ -70,7 +71,7 @@ rule simulate_tree:
         " -ad {output.ad_file} -dp {output.dp_file} -doublets {output.doublet_file} -scs {output.binary_file} -cnv-file {output.cnv_file} "
         " -clusters {output.clusters_file} -prev {output.prev_file} -s {wildcards.seed} -delta {wildcards.tdoublet} -depth {wildcards.nreads} "
         " -alpha-fp {wildcards.alpha_fp} -alpha-fn {wildcards.alpha_fn} -ado {wildcards.ado} -t {wildcards.nmuts} -n {params.nnodes} -exp {params.ncells} -het {params.hetero} -beta {wildcards.bprec} "
-        " -cna-rate {wildcards.cna} -loss-rate {wildcards.loss} -copy-error "
+        " -cna-rate {wildcards.cna} -loss-rate {wildcards.loss} -copy-error -max-copies {params.max_add_copies}"
         " -rare-thresh {params.rare} -nbdispersion {params.nbdisp} "
         " > {log.std} 2> {log.err}"
 
@@ -88,7 +89,7 @@ rule detectDoublets:
     shell:
         "python ../scripts/doubletD.py --inputTotal {input.dp_file} --inputAlternate {input.ad_file}  "
         " --delta {wildcards.tdoublet} --beta {wildcards.ado} -o {output.outfile} "
-        " --prec {wildcards.bprec} --alpha_fp {wildcards.alpha_fp} --alpha_fn {wildcards.alpha_fn} "
+        " --prec {wildcards.bprec} --alpha_fp {wildcards.alpha_fp} --alpha_fn {wildcards.alpha_fn}  "
         " --estimate --cellcoal --missing > {log.std} 2> {log.err}"
 
 
@@ -98,7 +99,7 @@ rule scrublet:
         dp_file = "read_counts/s{seed}/m{nmuts}_r{nreads}_d{tdoublet}_fp{alpha_fp}_fn{alpha_fn}_a{ado}_p{bprec}_c{cna}_l{loss}_dp.csv",
     output: 
         outfile ="prediction/scrublet/s{seed}/i{tdoublet}/m{nmuts}_r{nreads}_d{tdoublet}_fp{alpha_fp}_fn{alpha_fn}_a{ado}_p{bprec}_c{cna}_l{loss}_prediction.out",
-    benchmark: "prediction/doubletD/s{seed}/i{tdoublet}/m{nmuts}_r{nreads}_d{tdoublet}_fp{alpha_fp}_fn{alpha_fn}_a{ado}_p{bprec}_c{cna}_l{loss}_benchmark.log" 
+    prediction: "prediction/scrublet/s{seed}/i{tdoublet}/m{nmuts}_r{nreads}_d{tdoublet}_fp{alpha_fp}_fn{alpha_fn}_a{ado}_p{bprec}_c{cna}_l{loss}_benchmark.log" 
     log: 
         std = "prediction/scrublet/s{seed}/i{tdoublet}/m{nmuts}_r{nreads}_d{tdoublet}_fp{alpha_fp}_fn{alpha_fn}_a{ado}_p{bprec}_c{cna}_l{loss}.log",
         err = "prediction/scrublet/s{seed}/i{tdoublet}/m{nmuts}_r{nreads}_d{tdoublet}_fp{alpha_fp}_fn{alpha_fn}_a{ado}_p{bprec}_c{cna}_l{loss}.err.log" 
@@ -109,37 +110,3 @@ rule scrublet:
 
 
 
-rule simulate_tree_extremeCNA:
-    output:
-        ad_file = "read_counts/s{seed}/m{nmuts}_r{nreads}_d{tdoublet}_fp{alpha_fp}_fn{alpha_fn}_a{ado}_p{bprec}_c{cna}_l{loss}_ad.csv",
-        dp_file = "read_counts/s{seed}/m{nmuts}_r{nreads}_d{tdoublet}_fp{alpha_fp}_fn{alpha_fn}_a{ado}_p{bprec}_c{cna}_l{loss}_dp.csv",
-        doublet_file = "sim_aux/s{seed}/m{nmuts}_r{nreads}_d{tdoublet}_fp{alpha_fp}_fn{alpha_fn}_a{ado}_p{bprec}_c{cna}_l{loss}_doublets.csv",
-        mutalleles_file = "sim_aux/s{seed}/m{nmuts}_r{nreads}_d{tdoublet}_fp{alpha_fp}_fn{alpha_fn}_a{ado}_p{bprec}_c{cna}_l{loss}_mutAlleles.csv",
-        refalleles_file = "sim_aux/s{seed}/m{nmuts}_r{nreads}_d{tdoublet}_fp{alpha_fp}_fn{alpha_fn}_a{ado}_p{bprec}_c{cna}_l{loss}_refAlleles.csv",
-        cellgenotype_file = "sim_aux/s{seed}/m{nmuts}_r{nreads}_d{tdoublet}_fp{alpha_fp}_fn{alpha_fn}_a{ado}_p{bprec}_c{cna}_l{loss}_cellgenotypes.csv",
-        binary_file = "sim_aux/s{seed}/m{nmuts}_r{nreads}_d{tdoublet}_fp{alpha_fp}_fn{alpha_fn}_a{ado}_p{bprec}_c{cna}_l{loss}_binary.csv",
-        tree_file = "sim_aux/s{seed}/m{nmuts}_r{nreads}_d{tdoublet}_fp{alpha_fp}_fn{alpha_fn}_a{ado}_p{bprec}_c{cna}_l{loss}_tree.csv",
-        param_file = "sim_aux/s{seed}/m{nmuts}_r{nreads}_d{tdoublet}_fp{alpha_fp}_fn{alpha_fn}_a{ado}_p{bprec}_c{cna}_l{loss}_param.csv",
-        prev_file = "sim_aux/s{seed}/m{nmuts}_r{nreads}_d{tdoublet}_fp{alpha_fp}_fn{alpha_fn}_a{ado}_p{bprec}_c{cna}_l{loss}_prev.csv",
-        loh_file = "sim_aux/s{seed}/m{nmuts}_r{nreads}_d{tdoublet}_fp{alpha_fp}_fn{alpha_fn}_a{ado}_p{bprec}_c{cna}_l{loss}_loh.csv",
-        cnv_file = "sim_aux/s{seed}/m{nmuts}_r{nreads}_d{tdoublet}_fp{alpha_fp}_fn{alpha_fn}_a{ado}_p{bprec}_c{cna}_l{loss}_cna.csv",
-        clusters_file = "sim_aux/s{seed}/m{nmuts}_r{nreads}_d{tdoublet}_fp{alpha_fp}_fn{alpha_fn}_a{ado}_p{bprec}_c{cna}_l{loss}_clusters.csv",
-    params:
-        nnodes = config["nnodes"],
-        ncells = config["ncells"],
-        hetero = config["hetero"],
-        rare = config['rare'],
-        nbdisp = config['nbdisp'],
-        max_add_copies = 5
-    log:
-        std = "sim_aux/s{seed}/m{nmuts}_r{nreads}_d{tdoublet}_fp{alpha_fp}_fn{alpha_fn}_a{ado}_p{bprec}_c{cna}_l{loss}.log", 
-        err = "sim_aux/s{seed}/m{nmuts}_r{nreads}_d{tdoublet}_fp{alpha_fp}_fn{alpha_fn}_a{ado}_p{bprec}_c{cna}_l{loss}.err.log" 
-    shell:
-        "./scsim -tree {output.tree_file} -params {output.param_file}  "
-        " -mut-copies {output.mutalleles_file} -ref-copies {output.refalleles_file} -cell_genotypes {output.cellgenotype_file} -loh-file {output.loh_file} "
-        " -ad {output.ad_file} -dp {output.dp_file} -doublets {output.doublet_file} -scs {output.binary_file} -cnv-file {output.cnv_file} "
-        " -clusters {output.clusters_file} -prev {output.prev_file} -s {wildcards.seed} -delta {wildcards.tdoublet} -depth {wildcards.nreads} "
-        " -alpha-fp {wildcards.alpha_fp} -alpha-fn {wildcards.alpha_fn} -ado {wildcards.ado} -t {wildcards.nmuts} -n {params.nnodes} -exp {params.ncells} -het {params.hetero} -beta {wildcards.bprec} "
-        " -cna-rate {wildcards.cna} -loss-rate {wildcards.loss} -copy-error -max-copies {params.max_add_copies} "
-        " -rare-thresh {params.rare} -nbdispersion {params.nbdisp} "
-        " > {log.std} 2> {log.err}"

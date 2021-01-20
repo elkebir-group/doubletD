@@ -30,11 +30,13 @@ cna:
     - 0.0
     - 0.1
     - 0.5
+  #  - 1.0
 
 cna_ext: 1.0
 loss_ext: 0.0
 
 loss:
+    # - 0.0
     - 0.5
     - 1.0
 
@@ -52,7 +54,7 @@ tdoublet:
 
 bprec:
     - 15
-    - 1000
+    # - 1000
 
 #https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4138190/
 fp:
