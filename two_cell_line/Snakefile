@@ -1,0 +1,93 @@
+
+configfile: "config.yaml"
+
+rule all:
+    input:
+        expand("prediction/doubletD/d{tdoublet}_i{pdoublet}_p{bprec}_fp{fp}_fn{fn}_a{ado}_prediction.out",
+                  pdoublet=config["pdoublet"],
+                  tdoublet=config["tdoublet"], 
+                  fp=config["fp"], 
+                  fn = config["fn"],
+                  ado=config["ado"], 
+                  bprec=config['bprec']),
+        expand("prediction/Scrublet/d{tdoublet}_i{tdoublet}_p{bprec}_fp{fp}_fn{fn}_a{ado}_prediction.out",
+                  pdoublet=config["pdoublet"],
+                  tdoublet=config["tdoublet"], 
+                  fp=config["fp"], 
+                  fn = config["fn"],
+                  ado=config["ado"], 
+                  bprec=config['bprec']),
+        # expand("prediction/SCG/d{tdoublet}_i{tdoublet}_p{bprec}_fp{fp}_fn{fn}_a{ado}_prediction.out",
+        #           pdoublet=config["pdoublet"],
+        #           tdoublet=config["tdoublet"], 
+        #           fp=config["fp"], 
+        #           fn = config["fn"],
+        #           ado=config["ado"], 
+        #           bprec=config['bprec']),
+        "read_counts/discrete.tsv"
+
+rule detectDoublets:
+    input:
+        ad_file = "read_counts/AD.csv",
+        dp_file = "read_counts/DP.csv",
+    output: 
+        outfile ="prediction/doubletD/d{tdoublet}_i{pdoublet}_p{bprec}_fp{fp}_fn{fn}_a{ado}_prediction.out",
+    benchmark: "prediction/doubletD/d{tdoublet}_i{pdoublet}_p{bprec}_fp{fp}_fn{fn}_a{ado}_benchmark.log" 
+    log: 
+        std = "prediction/doubletD/d{tdoublet}_i{pdoublet}_p{bprec}_fp{fp}_fn{fn}_a{ado}.log",
+        err = "prediction/doubletD/d{tdoublet}_i{pdoublet}_p{bprec}_fp{fp}_fn{fn}_a{ado}.err.log" 
+    shell:
+        "python ../scripts/doubletD.py --inputTotal {input.dp_file} --inputAlternate {input.ad_file}  "
+        " --delta {wildcards.pdoublet} --beta {wildcards.ado} -o {output.outfile} "
+        " --prec {wildcards.bprec} --alpha_fp {wildcards.fp} --alpha_fn {wildcards.fn} "
+        " --estimate --cellcoal --missing > {log.std} 2> {log.err}"
+
+
+rule scrublet:
+    input:
+        ad_file = "read_counts/AD.csv",
+        dp_file = "read_counts/DP.csv",
+    output: 
+        outfile ="prediction/Scrublet/d{tdoublet}_i{pdoublet}_p{bprec}_fp{fp}_fn{fn}_a{ado}_prediction.out",
+    benchmark: "prediction/Scrublet/d{tdoublet}_i{pdoublet}_p{bprec}_fp{fp}_fn{fn}_a{ado}_benchmark.log" 
+    log: 
+        std = "prediction/Scrublet/d{tdoublet}_i{pdoublet}_p{bprec}_fp{fp}_fn{fn}_a{ado}.log",
+        err = "prediction/Scrublet/d{tdoublet}_i{pdoublet}_p{bprec}_fp{fp}_fn{fn}_a{ado}.err.log" 
+    shell:    
+        "python scrublet_benchmark.py --inputAlternate {input.ad_file} --inputTotal {input.dp_file} "
+        " --delta {wildcards.pdoublet} -o {output.outfile} "
+        " > {log.std} 2> {log.err}"
+
+
+rule discretize:
+    input:
+        ad_file = "read_counts/AD.csv",
+        dp_file = "read_counts/DP.csv",
+    output:
+        outfile = "read_counts/discrete.tsv",
+    params:
+        pval = config['pval'],
+        alpha_fp = config['fp'],
+        alpha_fn = config['fn']
+    script:
+        'discretize_counts.R'
+
+rule scg:
+    input:
+        inputfile = "read_counts/discrete.tsv",
+        cfigfile = config['scg_config'],
+        statemap = config['scg_state'],
+    output: 
+        outfile ="prediction/SCG/d{tdoublet}_i{tdoublet}_p{bprec}_fp{fp}_fn{fn}_a{ado}_prediction.out",
+    benchmark: "prediction/SCG/d{tdoublet}_i{tdoublet}_p{bprec}_fp{fp}_fn{fn}_a{ado}_benchmark.log" 
+    params:
+        seed = config['seed']
+    log: 
+        std = "prediction/SCG/d{tdoublet}_i{tdoublet}_p{bprec}_fp{fp}_fn{fn}_a{ado}.log",
+        err = "prediction/SCG/d{tdoublet}_i{tdoublet}_p{bprec}_fp{fp}_fn{fn}_a{ado}.err.log" 
+    shell:    
+        "python scg_bench.py --input {input.inputfile} -o {output.outfile}  "
+        " --delta {wildcards.tdoublet}  "
+        " --config_file {input.cfigfile} --state_map_file {input.statemap} "
+        " -s {params.seed} "
+        " > {log.std} 2> {log.err}"
