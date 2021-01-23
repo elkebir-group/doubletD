@@ -55,16 +55,17 @@ class doubletFinder():
                 total = self.df_total[m]
                 vaf = pd.DataFrame(reads/total)
             
-                # loh_cells = (1-self.beta)*vaf.loc[vaf[m] > 0.85]
-                # wt_cells = (1-self.beta)*vaf.loc[vaf[m] < 0.15]
+              
 
-                loh_cells = vaf.loc[vaf[m] > 0.8]
-                wt_cells =  vaf.loc[vaf[m] < 0.2]
-                het_cells = vaf.loc[(vaf[m] >= 0.4 )& (vaf[m] <= 0.6)]
+                loh_cells = vaf.loc[vaf[m] > 0.85]
+                wt_cells = vaf.loc[vaf[m] < 0.15]
+                het_cells = vaf.loc[(vaf[m] >= 0.15 )& (vaf[m] <= 0.85)]
+                # # loh_cells = vaf.loc[vaf[m] > 0.8]
+                # # wt_cells =  vaf.loc[vaf[m] < 0.2]
+                # het_cells = vaf.loc[(vaf[m] >= 0.4 )& (vaf[m] <= 0.6)]
                 
-                #count the total number of non-na VAF cells for variant m
+                # #count the total number of non-na VAF cells for variant m
                 non_na_cells =  loh_cells.shape[0] + wt_cells.shape[0] + het_cells.shape[0]
-            
                 est_wt_rate = wt_cells.shape[0]/non_na_cells
                 est_loh_rate = loh_cells.shape[0]/non_na_cells
                 est_het_rate = het_cells.shape[0]/non_na_cells
