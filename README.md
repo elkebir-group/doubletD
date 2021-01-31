@@ -44,12 +44,13 @@ See `data/sample_prediction.tsv` for an example.
 
 ### Arguments
 
+Parameters with default value `None` are estimated from data
+
     usage: doubletD.py [-h] [--inputTotal INPUTTOTAL]
                        [--inputAlternate INPUTALTERNATE] [--delta DELTA]
                        [--beta BETA] [--mu_hetero MU_HETERO] [--mu_homo MU_HOMO]
                        [--alpha_fp ALPHA_FP] [--alpha_fn ALPHA_FN] [-o OUTPUTFILE]
-                       [--noverbose] [--cellcoal] [--binomial] [--prec PREC]
-                       [--asym] [--allelic-imbalance] [--missing] [--estimate]
+                       [--noverbose] [--binomial] [--prec PREC] [--missing]
 
     optional arguments:
       -h, --help            show this help message and exit
@@ -62,20 +63,18 @@ See `data/sample_prediction.tsv` for an example.
       --delta DELTA         doublet rate [0.1]
       --beta BETA           Allelic dropout (ADO) rate [0.05]
       --mu_hetero MU_HETERO
-                            heterozygous mutation rate [0.5]
-      --mu_homo MU_HOMO     homozygous mutation rate [0]
-      --alpha_fp ALPHA_FP   copy false positive error rate [0]
-      --alpha_fn ALPHA_FN   copy flase negative error rate [0]
+                            heterozygous mutation rate [None]
+      --mu_homo MU_HOMO     homozygous mutation rate [None]
+      --alpha_fp ALPHA_FP   copy false positive error rate [None]
+      --alpha_fn ALPHA_FN   copy flase negative error rate [None]
       -o OUTPUTFILE, --outputfile OUTPUTFILE
                             output file name
       --noverbose           do not output statements from internal solvers
                             [default is false]
-      --cellcoal            use cellcoal doublet model [default is false]
       --binomial            use cellcoal doublet model [default is false]
-      --prec PREC           Precision for Beta Distribution [10000]
-      --asym                use asymmetric sequencing error model? [No]
-      --allelic-imbalance   allelic imbalance model? [No]
+      --prec PREC           Precision for Beta Distribution [None]
       --missing             use missing data in the model? [No]
-      --estimate            Estimate mutation rates from input data
+
+
 
 ### Example
