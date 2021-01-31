@@ -12,10 +12,11 @@ import argparse
 import itertools
 import math
 import scipy.special as ss
+import numpy as np
 
 class doubletFinder():
 
-    def __init__(self, df_total, df_alt, delta, beta, mu_hetero, mu_homo, alpha_fp, alpha_fn, asym=False, all_imb=False, missing=False, verbose=True, cellcoal=False, binom=False, precision=10000, estimate=False):
+    def __init__(self, df_total, df_alt, delta, beta, mu_hetero, mu_homo, alpha_fp, alpha_fn, missing=False, verbose=True, binom=False, precision=None):
 
         self.df_total = df_total
         self.df_alt = df_alt
@@ -32,22 +33,46 @@ class doubletFinder():
         if binom:
             self.prv_y = self.prv_y_b
         else:
-            if all_imb:
-                self.prv_y = self.prv_y_all_imb
-            else:
-                self.prv_y = self.prv_y_bb
+            self.prv_y = self.prv_y_bb
 
         self.cells = list(df_total['cell_id'].values)
         self.muts = list(df_total.columns[1:])
         self.df_total = self.df_total.set_index(['cell_id'])
         self.df_alt = self.df_alt.set_index(['cell_id'])
 
+        if (self.df_total.values - self.df_alt.values).min() < 0:
+            raise Exception('total reads must be greater than or equal to alternate reads!')
+
         self.Sigma = ((0, 1/2, 1), (0, 1/4, 1/2, 3/4, 1))
         self.Theta = ((0, 1/2, 1), (0, 1/4, 1/3, 1/2, 2/3, 3/4, 1))
 
         self.px_z = {x: 0 for z in [0,1] for x in itertools.product(self.muts, self.Sigma[z], [z])}
-        
+
+        if self.alpha_fn == None or self.alpha_fp == None or self.precision == None:
+            # get vaf numpy array
+            vaf_values = (self.df_alt / self.df_total).values
+            vaf_values = vaf_values[~np.isnan(vaf_values)]
+
+            # filter vafs less than 0.15 and get alpha_fp
+            if self.alpha_fp == None or self.precision == None:
+                mean1, prec1 = getBetaMOM(vaf_values[vaf_values <= 0.15])
+                self.alpha_fp = mean1
             
+            if self.alpha_fn == None or self.precision == None:
+                mean2, prec2 = getBetaMOM(vaf_values[vaf_values >= 0.85])
+                self.alpha_fn = 1 - mean2
+
+            if self.precision == None:
+                mean3, prec3 = getBetaMOM(vaf_values[(vaf_values > 0.15) & (vaf_values < 0.85)])
+                self.precision = np.median([prec1, prec2, prec3])
+
+        print(f"alpha_fn = {self.alpha_fn}")
+        print(f"alpha_fp = {self.alpha_fp}")
+        print(f"precision = {self.precision}")
+
+        if self.mu_homo == None or self.mu_hetero == None:
+            estimate = True
+
         for m in self.muts:
             if estimate:
             
@@ -71,9 +96,10 @@ class doubletFinder():
                 est_het_rate = het_cells.shape[0]/non_na_cells
                 #print(f"mut:{m} het:{est_het_rate} loh:{est_loh_rate} wt:{est_wt_rate}")
                 self.px_z[m, 0,0] = est_wt_rate
-                self.px_z[m, 1/2,0] =  est_het_rate
-                self.px_z[m, 1, 0] = est_loh_rate
-
+                if self.mu_hetero == None:
+                    self.px_z[m, 1/2,0] =  est_het_rate
+                if self.mu_homo == None:
+                    self.px_z[m, 1, 0] = est_loh_rate
 
             else:
                 self.px_z[m, 0,0] = 1 - self.mu_homo - self.mu_hetero
@@ -96,47 +122,28 @@ class doubletFinder():
 
         self.py_xz = {x: 0 for z in [0,1] for x in itertools.product(self.Theta[z], self.Sigma[z], [z])}
 
-        if not cellcoal:
-            self.py_xz[0,   0,   0]= 1
-            self.py_xz[0,   1/2, 0]= self.beta/2
-            self.py_xz[1/2, 1/2, 0]= 1-self.beta
-            self.py_xz[1,   1/2, 0]= self.beta/2
-            self.py_xz[1,   1,   0]= 1
-
-            self.py_xz[0,   0,   1]= 1
-            self.py_xz[0, 1/4,   1]= self.beta/4
-            self.py_xz[1/4, 1/4, 1]= 1-self.beta
-            self.py_xz[1/3, 1/4, 1]= 3*self.beta/4
-            self.py_xz[1/3, 1/2, 1]= self.beta/2
-            self.py_xz[1/2, 1/2, 1]= 1-self.beta
-            self.py_xz[2/3, 1/2, 1]= self.beta/2
-            self.py_xz[2/3, 3/4, 1]= 3*self.beta/4
-            self.py_xz[3/4, 3/4, 1]= 1-self.beta
-            self.py_xz[1,   3/4, 1]= self.beta/4
-            self.py_xz[1, 1, 1] = 1
-        else:
-            self.py_xz[0,   0,   0]= 1 - self.beta**2
-            self.py_xz[0,   1/2, 0]= self.beta * (1 - self.beta)
-            self.py_xz[1/2, 1/2, 0]= (1-self.beta)**2
-            self.py_xz[1,   1/2, 0]= self.beta * (1 - self.beta)
-            self.py_xz[1,   1,   0]= 1 - self.beta**2
-
-            self.py_xz[0,   0,   1]= 1 - self.beta**4
-            self.py_xz[0, 1/4,   1]= self.beta * (1 - self.beta)**3 + 3 * self.beta**2 * (1 - self.beta)**2 + 3 * self.beta**3 * (1 - self.beta)
-            self.py_xz[1/4, 1/4, 1]= (1 - self.beta)**4 
-            self.py_xz[1/3, 1/4, 1]= 3*self.beta*(1 - self.beta)**3
-            self.py_xz[1/2, 1/4, 1]= 3*self.beta**2 * (1 - self.beta)**2
-            self.py_xz[1,   1/4, 1]= self.beta**3 * (1 - self.beta)
-            self.py_xz[1/3, 1/2, 1]= 2 * self.beta * (1 - self.beta)**3
-            self.py_xz[1/2, 1/2, 1]= (1-self.beta)**4 + 4 * self.beta**2 * (1 - self.beta)**2
-            self.py_xz[2/3, 1/2, 1]= 2 * self.beta * (1 - self.beta)**3
-            self.py_xz[1,   1/2, 1]= self.beta**2 * (1 - self.beta)**2 + 2 * self.beta**3 * (1 - self.beta)
-            self.py_xz[0,   3/4, 1]= self.py_xz[1,   1/4, 1]
-            self.py_xz[1/2, 3/4, 1]= self.py_xz[1/2, 1/4, 1]
-            self.py_xz[2/3, 3/4, 1]= self.py_xz[1/3, 1/4, 1]
-            self.py_xz[3/4, 3/4, 1]= self.py_xz[1/4, 1/4, 1]
-            self.py_xz[1,   3/4, 1]= self.py_xz[0,   1/4, 1]
-            self.py_xz[1, 1, 1] = 1 - self.beta**4
+        self.py_xz[0,   0,   0]= 1 - self.beta**2
+        self.py_xz[0,   1/2, 0]= self.beta * (1 - self.beta)
+        self.py_xz[1/2, 1/2, 0]= (1-self.beta)**2
+        self.py_xz[1,   1/2, 0]= self.beta * (1 - self.beta)
+        self.py_xz[1,   1,   0]= 1 - self.beta**2
+	
+        self.py_xz[0,   0,   1]= 1 - self.beta**4
+        self.py_xz[0, 1/4,   1]= self.beta * (1 - self.beta)**3 + 3 * self.beta**2 * (1 - self.beta)**2 + 3 * self.beta**3 * (1 - self.beta)
+        self.py_xz[1/4, 1/4, 1]= (1 - self.beta)**4 
+        self.py_xz[1/3, 1/4, 1]= 3*self.beta*(1 - self.beta)**3
+        self.py_xz[1/2, 1/4, 1]= 3*self.beta**2 * (1 - self.beta)**2
+        self.py_xz[1,   1/4, 1]= self.beta**3 * (1 - self.beta)
+        self.py_xz[1/3, 1/2, 1]= 2 * self.beta * (1 - self.beta)**3
+        self.py_xz[1/2, 1/2, 1]= (1-self.beta)**4 + 4 * self.beta**2 * (1 - self.beta)**2
+        self.py_xz[2/3, 1/2, 1]= 2 * self.beta * (1 - self.beta)**3
+        self.py_xz[1,   1/2, 1]= self.beta**2 * (1 - self.beta)**2 + 2 * self.beta**3 * (1 - self.beta)
+        self.py_xz[0,   3/4, 1]= self.py_xz[1,   1/4, 1]
+        self.py_xz[1/2, 3/4, 1]= self.py_xz[1/2, 1/4, 1]
+        self.py_xz[2/3, 3/4, 1]= self.py_xz[1/3, 1/4, 1]
+        self.py_xz[3/4, 3/4, 1]= self.py_xz[1/4, 1/4, 1]
+        self.py_xz[1,   3/4, 1]= self.py_xz[0,   1/4, 1]
+        self.py_xz[1, 1, 1] = 1 - self.beta**4
 
 
         #print(self.py_xz)
@@ -203,18 +210,10 @@ class doubletFinder():
         return log_prob_sum
 
     def prv_y_b(self, r, v, y):
-#        if self.asym:
-#            yprime = y - 4 * self.alpha * y + 3 * self.alpha
-#        else:
-#            yprime = y - 2 * self.alpha * y + self.alpha
         yprime = self.alpha_fp + (1 - self.alpha_fp - self.alpha_fn) * y
         return nCr(r+v, v) * (yprime ** v) * ((1-yprime) ** r)
 
     def prv_y_bb(self, r, v, y):
-#        if self.asym:
-#            yprime = y - 4 * self.alpha * y + 3 * self.alpha
-#        else:
-#            yprime = y - 2 * self.alpha * y + self.alpha
         yprime = self.alpha_fp + (1 - self.alpha_fp - self.alpha_fn) * y
         if yprime == 0:
             yprime = 0.001
@@ -223,41 +222,12 @@ class doubletFinder():
         alpha = self.precision*yprime 
         beta = self.precision - alpha
         n = r + v 
-        #print(f"n:{n} p:{y} alpha:{alpha} beta:{beta}")
+        #print(f"n:{n} r:{r} v:{v} p:{y} alpha:{alpha} beta:{beta}")
         num = math.lgamma(n+1) + math.lgamma(v+alpha) + math.lgamma(n-v+beta) + math.lgamma(alpha+beta)
         den = math.lgamma(v+1) + math.lgamma(n-v+1) + math.lgamma(n+ alpha + beta) + math.lgamma(alpha) + math.lgamma(beta)
         prob = math.exp(num- den)
 
         return prob
-
-    def prv_y_bb_rev(self, r, v, y):
-        if self.asym:
-            a = 3 * self.alpha
-            b = 1 - 4 * self.alpha
-        else:
-            a = self.alpha
-            b = 1 - 2 * self.alpha
-
-        alpha = self.precision * y
-        beta = self.precision - alpha
-
-        k = np.arange(v)
-        l = np.arange(r)
-
-        k_terms = ss.gamma(alpha + k) * ss.comb(v, k) * a**(v - k)
-        l_terms = ss.gamma(beta + l) * ss.comb(r, l) * (1 - a - b)**(r - l)
-        k = k.reshape(-1, 1)
-        l = l.reshape(1, -1)
-        kl_terms= b**(k + l) / ss.gamma(alpha + beta + k + l)
-
-        return np.einsum("i,j,ij", k_terms, l_terms, kl_terms) * ss.comb(n, v) / ss.beta(alpha, beta)
-
-
-    def prv_y_all_imb(self, r, v, y):
-        if y in [0, 1]:
-            return self.prv_y_b(r, v, y)
-        else:
-            return self.prv_y_bb(r, v, y)
 
     def writeSolution(self, outputFile):
 
@@ -272,6 +242,15 @@ class doubletFinder():
             if self.doublet_result[cell] == 'doublet':
                 likelihood += self.logprobs[cell,1] - self.logprobs[cell,0] - self.threshold
         return likelihood
+
+def getBetaMOM(x):
+
+    m_x = np.mean(x)
+    s_x = np.std(x)
+    x_alpha = m_x*((m_x*(1 - m_x)/s_x**2) - 1)
+    x_beta = (1 - m_x)*((m_x*(1 - m_x)/s_x**2) - 1) 
+    
+    return x_alpha/(x_alpha + x_beta), x_alpha + x_beta
 
 def nCr(n,r):
     f = math.factorial
@@ -296,10 +275,9 @@ def main(args):
         print(f"number of cells is {ncells}")
         print(f"number of mutation positions is {npos}")
 
-    solver = doubletFinder(df_total, df_alt, delta = args.delta, beta = args.beta, all_imb = args.all_imb, missing = args.missing, 
-                           mu_hetero = args.mu_hetero, mu_homo = args.mu_homo, alpha_fp = args.alpha_fp, alpha_fn = args.alpha_fn, asym = args.asym,
-                           verbose = args.verbose, cellcoal = args.cellcoal, binom = args.binom, precision = args.prec,
-                           estimate = args.estimate)
+    solver = doubletFinder(df_total, df_alt, delta = args.delta, beta = args.beta, missing = args.missing, 
+                           mu_hetero = args.mu_hetero, mu_homo = args.mu_homo, alpha_fp = args.alpha_fp, alpha_fn = args.alpha_fn,
+                           verbose = args.verbose, binom = args.binom, precision = args.prec)
 
     solver.solve()
 
@@ -321,25 +299,17 @@ if __name__ == "__main__":
     parser.add_argument("--inputAlternate", type=str, help="csv file with a table of alternate read counts for each position in each cell")
     parser.add_argument("--delta", type=float, default=0.1, help="doublet rate [0.1]")
     parser.add_argument("--beta", type=float, default=0.05, help="Allelic dropout (ADO) rate [0.05]")
-    parser.add_argument("--mu_hetero", type=float, default=0.5, help="heterozygous mutation rate [0.5]")
-    parser.add_argument("--mu_homo", type=float, default=0, help="homozygous mutation rate [0]")
-    parser.add_argument("--alpha_fp", type=float, default = 0, help="copy false positive error rate [0]")
-    parser.add_argument("--alpha_fn", type=float, default = 0, help="copy flase negative error rate [0]")
+    parser.add_argument("--mu_hetero", type=float, default=0.5, help="heterozygous mutation rate [None]")
+    parser.add_argument("--mu_homo", type=float, default=0, help="homozygous mutation rate [None]")
+    parser.add_argument("--alpha_fp", type=float, help="copy false positive error rate [None]")
+    parser.add_argument("--alpha_fn", type=float, help="copy flase negative error rate [None]")
     parser.add_argument("-o", "--outputfile", type=str, help="output file name")
     parser.add_argument("--noverbose", dest="verbose", help="do not output statements from internal solvers [default is false]", action='store_false')
-    parser.add_argument("--cellcoal", dest="cellcoal", help="use cellcoal doublet model [default is false]", action='store_true')
     parser.add_argument("--binomial", dest="binom", help="use cellcoal doublet model [default is false]", action='store_true')
-    parser.add_argument("--prec", type=float, default = 10000, help="Precision for Beta Distribution [10000]")
-    parser.add_argument("--asym", dest="asym", help="use asymmetric sequencing error model? [No]", action = 'store_true')
-    parser.add_argument("--allelic-imbalance", dest="all_imb", help="allelic imbalance model? [No]", action = 'store_true')
+    parser.add_argument("--prec", type=float, help="Precision for Beta Distribution [None]")
     parser.add_argument("--missing", dest="missing", help="use missing data in the model? [No]", action = 'store_true')
-    parser.add_argument("--estimate", dest="estimate", help="Estimate mutation rates from input data", action = 'store_true')
     parser.set_defaults(missing=False)
-    parser.set_defaults(all_imb=False)
-    parser.set_defaults(asym=False)
     parser.set_defaults(binom=False)
-    parser.set_defaults(cellcoal=False)
-    parser.set_defaults(estimate=False)
     parser.set_defaults(verbose=True)
 
     args = parser.parse_args(None if sys.argv[1:] else ['-h'])
