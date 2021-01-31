@@ -21,7 +21,6 @@ These processes introduce errors such as allelic dropouts and imbalance in ampli
 + python3 (>=3.6)
 + [numpy](https://numpy.org/doc/)
 + [pandas](https://pandas.pydata.org/pandas-docs/stable/index.html)
-<!-- + (optional for simulation pipeline) [snakemake (>=5.2.0)](https://snakemake.readthedocs.io) --?
 
 <a name="usage"></a>
 ## Usage instructions
