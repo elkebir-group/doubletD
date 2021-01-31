@@ -1,6 +1,6 @@
 # doubletD
 
-![Overview of doubletD](doubletD_overview.pdf)
+![Overview of doubletD](doubletD_overview.png)
 (a) The first step of most single-cell sequencing technologies involves cell capture where the goal is to encapsulate single cells into droplets, known as *singlets*.
 However, errors in this process can lead to three kind of doublets -- *neotypic* doublets, *nested* doublets and *selflets*.
 (b) The cells in each isolated droplet $i$ undergo whole-genome amplification and sequencing independently.
