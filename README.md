@@ -36,7 +36,7 @@ git clone git@github.com:elkebir-group/doubletD.git
 
 <a name="io"></a>
 ### I/O formats
-The input for Jumper is a text based with two input tab-separated dataframes -- one containing the total read counts and another containing the alternate read counts.
+The input for Jumper is a text based with two input comma-separated dataframes -- one containing the total read counts and another containing the alternate read counts.
 For both the files, each row is a different droplet and each column is a loci.
 See `data/sample_DP.tsv` and `data/sample_AD.tsv` for an example for both files.
 The output is also a datafram with each row for a different droplet and columns, from left to right, posterior probability that the dorplet is a singlet, posterior probability that the droplet is a doublet and prediction for the droplet to be either 'singlet' or 'doublet'.
@@ -78,3 +78,11 @@ Parameters with default value `None` are estimated from data
 
 
 ### Example
+
+Here we will show an example of how to run `doubletD`.
+The input files are located in the `example` directory.
+We run `doubletD` with a prior doublet probabiltity of 0.2 and ADO rate of 0.5 while using missing data in our model.
+
+    $ python scripts/doubletD.py --inputAlternate example/AD.csv --inputTotal example/DP.csv --delta 0.2 --beta 0.05 -o example/prediction.tsv 
+
+This command generates output file `prediction.tsv` in directory `example`.
