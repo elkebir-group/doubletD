@@ -11,8 +11,7 @@ These processes introduce errors such as allelic dropouts and imbalance in ampli
 ## Contents
 
   1. [Pre-requisites](#pre-requisites)
-  2. [Installation](#installation)
-  3. [Usage instcructions](#usage)
+  2. [Usage instcructions](#usage)
      * [I/O formats](#io)
      * [DoubletD](#doubletD)
      * [simulation](#simulation)
@@ -22,14 +21,7 @@ These processes introduce errors such as allelic dropouts and imbalance in ampli
 + python3 (>=3.6)
 + [numpy](https://numpy.org/doc/)
 + [pandas](https://pandas.pydata.org/pandas-docs/stable/index.html)
-+ (optional for simulation pipeline) [snakemake (>=5.2.0)](https://snakemake.readthedocs.io)
-
-<a name="installation"></a>
-## Installation
-
-```bash
-git clone git@github.com:elkebir-group/doubletD.git
-```
+<!--- + (optional for simulation pipeline) [snakemake (>=5.2.0)](https://snakemake.readthedocs.io) ---?
 
 <a name="usage"></a>
 ## Usage instructions
