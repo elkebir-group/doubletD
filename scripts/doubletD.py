@@ -11,7 +11,6 @@ import sys
 import argparse
 import itertools
 import math
-import scipy.special as ss
 import numpy as np
 
 class doubletFinder():
@@ -27,7 +26,6 @@ class doubletFinder():
         self.alpha_fp = alpha_fp
         self.alpha_fn = alpha_fn
         self.precision = precision
-        self.asym = asym
         self.missing = missing
        
         if binom:
@@ -72,6 +70,8 @@ class doubletFinder():
 
         if self.mu_homo == None or self.mu_hetero == None:
             estimate = True
+        else:
+            estimate = False
 
         for m in self.muts:
             if estimate:
@@ -80,8 +80,6 @@ class doubletFinder():
                 total = self.df_total[m]
                 vaf = pd.DataFrame(reads/total)
             
-              
-
                 loh_cells = vaf.loc[vaf[m] > 0.85]
                 wt_cells = vaf.loc[vaf[m] < 0.15]
                 het_cells = vaf.loc[(vaf[m] >= 0.15 )& (vaf[m] <= 0.85)]
@@ -96,10 +94,9 @@ class doubletFinder():
                 est_het_rate = het_cells.shape[0]/non_na_cells
                 #print(f"mut:{m} het:{est_het_rate} loh:{est_loh_rate} wt:{est_wt_rate}")
                 self.px_z[m, 0,0] = est_wt_rate
-                if self.mu_hetero == None:
-                    self.px_z[m, 1/2,0] =  est_het_rate
-                if self.mu_homo == None:
-                    self.px_z[m, 1, 0] = est_loh_rate
+                self.px_z[m, 1/2, 0] =  est_het_rate
+                self.px_z[m, 1, 0] = est_loh_rate
+
 
             else:
                 self.px_z[m, 0,0] = 1 - self.mu_homo - self.mu_hetero
@@ -299,8 +296,8 @@ if __name__ == "__main__":
     parser.add_argument("--inputAlternate", type=str, help="csv file with a table of alternate read counts for each position in each cell")
     parser.add_argument("--delta", type=float, default=0.1, help="doublet rate [0.1]")
     parser.add_argument("--beta", type=float, default=0.05, help="Allelic dropout (ADO) rate [0.05]")
-    parser.add_argument("--mu_hetero", type=float, default=0.5, help="heterozygous mutation rate [None]")
-    parser.add_argument("--mu_homo", type=float, default=0, help="homozygous mutation rate [None]")
+    parser.add_argument("--mu_hetero", type=float, help="heterozygous mutation rate [None]")
+    parser.add_argument("--mu_homo", type=float, help="homozygous mutation rate [None]")
     parser.add_argument("--alpha_fp", type=float, help="copy false positive error rate [None]")
     parser.add_argument("--alpha_fn", type=float, help="copy flase negative error rate [None]")
     parser.add_argument("-o", "--outputfile", type=str, help="output file name")
