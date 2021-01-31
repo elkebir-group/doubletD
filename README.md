@@ -81,7 +81,7 @@ Parameters with default value `None` are estimated from data
 
 Here we will show an example of how to run `doubletD`.
 The input files are located in the `example` directory.
-We run `doubletD` with a prior doublet probabiltity of 0.2 and ADO rate of 0.5 while using missing data in our model.
+We run `doubletD` with a prior doublet probabiltity of 0.2 and ADO rate of 0.5 without using missing data in our model.
 
     $ python scripts/doubletD.py --inputAlternate example/AD.csv --inputTotal example/DP.csv --delta 0.2 --beta 0.05 -o example/prediction.tsv 
 
