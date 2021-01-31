@@ -5,14 +5,8 @@
 However, errors in this process can lead to three kind of doublets -- *neotypic* doublets, *nested* doublets and *selflets*.
 (b) The cells in each isolated droplet *i* undergo whole-genome amplification and sequencing independently.
 These processes introduce errors such as allelic dropouts and imbalance in amplification.
-(c) The resulting aligned reads are used for variant calling yielding alternate 
-<img src="https://bit.ly/3aj4AUm" align="center" border="0" alt="v_{i,j}" width="28" height="18" />
-and total 
-<img src="https://bit.ly/2YvzeUP" align="center" border="0" alt="c_{i,j}" width="26" height="18" />
- read counts at each locus of interest *j*.
-(d) doubletD uses the observed variant allele frequencies 
-<img src="https://bit.ly/2NK5xNG" align="center" border="0" alt="v_{i,j}/c_{i,j}" width="57" height="21" />
-as the key signal, while accounting for sequencing and amplification errors to detect doublets in the sample.
+(c) The resulting aligned reads are used for variant calling yielding alternate v_{i,j} and total c_{i,j} read counts at each locus of interest *j*.
+(d) doubletD uses the observed variant allele frequencies v_{i,j}/c_{i,j} as the key signal, while accounting for sequencing and amplification errors to detect doublets in the sample.
 
 ## Contents
 
