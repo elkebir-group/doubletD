@@ -15,14 +15,14 @@ import numpy as np
 
 class doubletFinder():
 
-    def __init__(self, df_total, df_alt, delta, beta, mu_hetero, mu_homo, alpha_fp, alpha_fn, missing=False, verbose=True, binom=False, precision=None):
+    def __init__(self, df_total, df_alt, delta, beta, mu_hetero, mu_hom, alpha_fp, alpha_fn, missing=False, verbose=True, binom=False, precision=None):
 
         self.df_total = df_total
         self.df_alt = df_alt
         self.delta = delta
         self.beta = beta
         self.mu_hetero = mu_hetero
-        self.mu_homo = mu_homo
+        self.mu_hom = mu_hom
         self.alpha_fp = alpha_fp
         self.alpha_fn = alpha_fn
         self.precision = precision
@@ -68,7 +68,7 @@ class doubletFinder():
         print(f"alpha_fp = {self.alpha_fp}")
         print(f"precision = {self.precision}")
 
-        if self.mu_homo == None or self.mu_hetero == None:
+        if self.mu_hom == None or self.mu_hetero == None:
             estimate = True
         else:
             estimate = False
@@ -99,9 +99,9 @@ class doubletFinder():
 
 
             else:
-                self.px_z[m, 0,0] = 1 - self.mu_homo - self.mu_hetero
+                self.px_z[m, 0,0] = 1 - self.mu_hom - self.mu_hetero
                 self.px_z[m, 1/2,0] =  self.mu_hetero
-                self.px_z[m, 1, 0] = self.mu_homo
+                self.px_z[m, 1, 0] = self.mu_hom
             
 
         norm_const = {}
@@ -147,9 +147,9 @@ class doubletFinder():
 
         # self.px_z = {x: 0 for z in [0,1] for x in itertools.product(self.Sigma[z], [z])}
 
-        # self.px_z[0,0] = 1 - self.mu_homo - self.mu_hetero
+        # self.px_z[0,0] = 1 - self.mu_hom - self.mu_hetero
         # self.px_z[1/2,0] = self.mu_hetero
-        # self.px_z[1, 0] = self.mu_homo
+        # self.px_z[1, 0] = self.mu_hom
 
         # for a,b in itertools.product(self.Sigma[0], repeat = 2):
         #     c = (a + b)/2
@@ -273,7 +273,7 @@ def main(args):
         print(f"number of mutation positions is {npos}")
 
     solver = doubletFinder(df_total, df_alt, delta = args.delta, beta = args.beta, missing = args.missing, 
-                           mu_hetero = args.mu_hetero, mu_homo = args.mu_homo, alpha_fp = args.alpha_fp, alpha_fn = args.alpha_fn,
+                           mu_hetero = args.mu_hetero, mu_hom = args.mu_hom, alpha_fp = args.alpha_fp, alpha_fn = args.alpha_fn,
                            verbose = args.verbose, binom = args.binom, precision = args.prec)
 
     solver.solve()
@@ -297,7 +297,7 @@ if __name__ == "__main__":
     parser.add_argument("--delta", type=float, default=0.1, help="doublet rate [0.1]")
     parser.add_argument("--beta", type=float, default=0.05, help="Allelic dropout (ADO) rate [0.05]")
     parser.add_argument("--mu_hetero", type=float, help="heterozygous mutation rate [None]")
-    parser.add_argument("--mu_homo", type=float, help="homozygous mutation rate [None]")
+    parser.add_argument("--mu_hom", type=float, help="homozygous mutation rate [None]")
     parser.add_argument("--alpha_fp", type=float, help="copy false positive error rate [None]")
     parser.add_argument("--alpha_fn", type=float, help="copy flase negative error rate [None]")
     parser.add_argument("-o", "--outputfile", type=str, help="output file name")
