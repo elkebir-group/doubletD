@@ -11,9 +11,9 @@ These processes introduce errors such as allelic dropouts and imbalance in ampli
 ## Contents
 
   1. [Pre-requisites](#pre-requisites)
-  2. [Usage instcructions](#usage)
+  2. [Usage instructions](#usage)
      * [I/O formats](#io)
-     * [DoubletD](#doubletD)
+     * [doubletD](#doubletD)
      * [simulation](#simulation)
 
 <a name="pre-requisites"></a>
@@ -27,10 +27,10 @@ These processes introduce errors such as allelic dropouts and imbalance in ampli
 
 <a name="io"></a>
 ### I/O formats
-The input for Jumper is a text based with two input comma-separated dataframes -- one containing the total read counts and another containing the alternate read counts.
+The input for doubletD is a text based with two input comma-separated dataframes -- one containing the total read counts and another containing the alternate read counts.
 For both the files, each row is a different droplet and each column is a loci.
 See `data/sample_DP.tsv` and `data/sample_AD.tsv` for an example for both files.
-The output is also a datafram with each row for a different droplet and columns, from left to right, posterior probability that the dorplet is a singlet, posterior probability that the droplet is a doublet and prediction for the droplet to be either 'singlet' or 'doublet'.
+The output is also a dataframe with each row for a different droplet and columns, from left to right, posterior probability that the droplet is a singlet, posterior probability that the droplet is a doublet and prediction for the droplet to be either 'singlet' or 'doublet'.
 See `data/sample_prediction.tsv` for an example.
 
 ### Arguments
@@ -72,7 +72,7 @@ Parameters with default value `None` are estimated from data
 
 Here we will show an example of how to run `doubletD`.
 The input files are located in the `example` directory.
-We run `doubletD` with a prior doublet probabiltity of 0.2 and ADO rate of 0.5 without using missing data in our model.
+We run `doubletD` with a prior doublet probabiltity of 0.2 and ADO rate of 0.05 without using missing data in our model.
 
     $ python scripts/doubletD.py --inputAlternate example/AD.csv --inputTotal example/DP.csv --delta 0.2 --beta 0.05 -o example/prediction.tsv 
 
