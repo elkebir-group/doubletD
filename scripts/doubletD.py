@@ -83,16 +83,14 @@ class doubletFinder():
                 loh_cells = vaf.loc[vaf[m] > 0.85]
                 wt_cells = vaf.loc[vaf[m] < 0.15]
                 het_cells = vaf.loc[(vaf[m] >= 0.15 )& (vaf[m] <= 0.85)]
-                # # loh_cells = vaf.loc[vaf[m] > 0.8]
-                # # wt_cells =  vaf.loc[vaf[m] < 0.2]
-                # het_cells = vaf.loc[(vaf[m] >= 0.4 )& (vaf[m] <= 0.6)]
+
                 
                 # #count the total number of non-na VAF cells for variant m
                 non_na_cells =  loh_cells.shape[0] + wt_cells.shape[0] + het_cells.shape[0]
                 est_wt_rate = wt_cells.shape[0]/non_na_cells
                 est_loh_rate = loh_cells.shape[0]/non_na_cells
                 est_het_rate = het_cells.shape[0]/non_na_cells
-                #print(f"mut:{m} het:{est_het_rate} loh:{est_loh_rate} wt:{est_wt_rate}")
+       
                 self.px_z[m, 0,0] = est_wt_rate
                 self.px_z[m, 1/2, 0] =  est_het_rate
                 self.px_z[m, 1, 0] = est_loh_rate
@@ -143,24 +141,6 @@ class doubletFinder():
         self.py_xz[1, 1, 1] = 1 - self.beta**4
 
 
-        #print(self.py_xz)
-
-        # self.px_z = {x: 0 for z in [0,1] for x in itertools.product(self.Sigma[z], [z])}
-
-        # self.px_z[0,0] = 1 - self.mu_hom - self.mu_hetero
-        # self.px_z[1/2,0] = self.mu_hetero
-        # self.px_z[1, 0] = self.mu_hom
-
-        # for a,b in itertools.product(self.Sigma[0], repeat = 2):
-        #     c = (a + b)/2
-        #     if c in self.Sigma[1]:
-        #         self.px_z[c,1] += self.px_z[a,0] * self.px_z[b,0]
-        # norm_const = sum([self.px_z[a,0] * self.px_z[b,0] for a,b in itertools.product(self.Sigma[0], repeat = 2)])
-
-        # for c in self.Sigma[1]:
-        #     self.px_z[c,1] /= norm_const
-
-        #print(self.px_z)
 
         self.doublet_result = None
 
@@ -202,7 +182,7 @@ class doubletFinder():
                 for y in self.Theta[z]:
                     prob_sum_x += self.prv_y(r, v, y) * self.py_xz[y, x, z]
                 prob_sum += self.px_z[mut, x, z] * prob_sum_x
-            #print(f"{cell}\t{mut}\t{r}\t{v}\t{prob_sum}")
+
             log_prob_sum += math.log(prob_sum)
         return log_prob_sum
 
@@ -294,16 +274,16 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--inputTotal", type=str, help="csv file with a table of total read counts for each position in each cell")
     parser.add_argument("--inputAlternate", type=str, help="csv file with a table of alternate read counts for each position in each cell")
-    parser.add_argument("--delta", type=float, default=0.1, help="doublet rate [0.1]")
-    parser.add_argument("--beta", type=float, default=0.05, help="Allelic dropout (ADO) rate [0.05]")
+    parser.add_argument("--delta", type=float, default=0.1, help="expected doublet rate [0.1]")
+    parser.add_argument("--beta", type=float, default=0.05, help="allelic dropout (ADO) rate [0.05]")
     parser.add_argument("--mu_hetero", type=float, help="heterozygous mutation rate [None]")
     parser.add_argument("--mu_hom", type=float, help="homozygous mutation rate [None]")
     parser.add_argument("--alpha_fp", type=float, help="copy false positive error rate [None]")
-    parser.add_argument("--alpha_fn", type=float, help="copy flase negative error rate [None]")
+    parser.add_argument("--alpha_fn", type=float, help="copy false negative error rate [None]")
     parser.add_argument("-o", "--outputfile", type=str, help="output file name")
     parser.add_argument("--noverbose", dest="verbose", help="do not output statements from internal solvers [default is false]", action='store_false')
-    parser.add_argument("--binomial", dest="binom", help="use cellcoal doublet model [default is false]", action='store_true')
-    parser.add_argument("--prec", type=float, help="Precision for Beta Distribution [None]")
+    parser.add_argument("--binomial", dest="binom", help="use binomial distribution for read count model [default is false]", action='store_true')
+    parser.add_argument("--prec", type=float, help="precision for beta-binomial distribution [None]")
     parser.add_argument("--missing", dest="missing", help="use missing data in the model? [No]", action = 'store_true')
     parser.set_defaults(missing=False)
     parser.set_defaults(binom=False)
