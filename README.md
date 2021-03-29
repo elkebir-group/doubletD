@@ -42,30 +42,29 @@ Parameters with default value `None` are estimated from data
                    [--beta BETA] [--mu_hetero MU_HETERO] [--mu_hom MU_HOM]
                    [--alpha_fp ALPHA_FP] [--alpha_fn ALPHA_FN] [-o OUTPUTFILE]
                    [--noverbose] [--binomial] [--prec PREC] [--missing]
-
-optional arguments:
-  -h, --help            show this help message and exit
-  --inputTotal INPUTTOTAL
-                        csv file with a table of total read counts for each
-                        position in each cell
-  --inputAlternate INPUTALTERNATE
-                        csv file with a table of alternate read counts for
-                        each position in each cell
-  --delta DELTA         expected doublet rate [0.1]
-  --beta BETA           allelic dropout (ADO) rate [0.05]
-  --mu_hetero MU_HETERO
-                        heterozygous mutation rate [None]
-  --mu_hom MU_HOM       homozygous mutation rate [None]
-  --alpha_fp ALPHA_FP   copy false positive error rate [None]
-  --alpha_fn ALPHA_FN   copy false negative error rate [None]
-  -o OUTPUTFILE, --outputfile OUTPUTFILE
-                        output file name
-  --noverbose           do not output statements from internal solvers
-                        [default is false]
-  --binomial            use binomial distribution for read count model
-                        [default is false]
-  --prec PREC           precision for beta-binomial distribution [None]
-  --missing             use missing data in the model? [No]
+      optional arguments:
+        -h, --help            show this help message and exit
+        --inputTotal INPUTTOTAL
+                              csv file with a table of total read counts for each
+                              position in each cell
+        --inputAlternate INPUTALTERNATE
+                              csv file with a table of alternate read counts for
+                              each position in each cell
+        --delta DELTA         expected doublet rate [0.1]
+        --beta BETA           allelic dropout (ADO) rate [0.05]
+        --mu_hetero MU_HETERO
+                              heterozygous mutation rate [None]
+        --mu_hom MU_HOM       homozygous mutation rate [None]
+        --alpha_fp ALPHA_FP   copy false positive error rate [None]
+        --alpha_fn ALPHA_FN   copy false negative error rate [None]
+        -o OUTPUTFILE, --outputfile OUTPUTFILE
+                              output file name
+        --noverbose           do not output statements from internal solvers
+                              [default is false]
+        --binomial            use binomial distribution for read count model
+                              [default is false]
+        --prec PREC           precision for beta-binomial distribution [None]
+        --missing             use missing data in the model? [No]
 
 
 
