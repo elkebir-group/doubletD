@@ -25,7 +25,9 @@ These processes introduce errors such as allelic dropouts and imbalance in ampli
 <a name="install"></a>
 
 ## Installation
- 
+
+### Using conda (recommended) 
+
 <a name="conda"></a>
   ```bash
   $ conda install -c bioconda doubletd
