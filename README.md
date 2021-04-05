@@ -36,7 +36,7 @@ These processes introduce errors such as allelic dropouts and imbalance in ampli
 ### Using pip (alternative)
 
 <a name="pre-requisites"></a>
-## Pre-requisites
+#### Pre-requisites
 + python3 (>=3.6)
 + setuptools
 + [numpy](https://numpy.org/doc/)
