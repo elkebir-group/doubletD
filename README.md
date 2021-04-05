@@ -42,17 +42,16 @@ These processes introduce errors such as allelic dropouts and imbalance in ampli
 
 <a name="install"></a>
   1. Clone the repository
+      ```bash
+            $ git clone https://github.com/elkebir-group/doubletD.git
+        ```
 
-    ```bash
-    $ git clone https://github.com/elkebir-group/doubletD.git
-    ```
   2. Install doubletD using pip
-    Clone the repository
     
-    ```bash
-    $ cd doubletd
-    $ pip install ./
-    ```
+     ```bash
+            $ cd doubletD
+        `   $ pip install ./
+      ```
 <a name="usage"></a>
 ## Usage instructions
 
