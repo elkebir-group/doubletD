@@ -1,5 +1,8 @@
 # doubletD
 
+[![Anaconda-Server Badge](https://anaconda.org/bioconda/moss/badges/version.svg)](https://anaconda.org/bioconda/doubletd)
+[![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg?style=flat)](http://bioconda.github.io/recipes/doubletd/README.html)
+
 ![Overview of doubletD](doubletD_overview.png)
 (a) The first step of most single-cell sequencing technologies involves cell capture where the goal is to encapsulate single cells into droplets, known as *singlets*.
 However, errors in this process can lead to three kind of doublets -- *neotypic* doublets, *nested* doublets and *selflets*.
@@ -10,18 +13,44 @@ These processes introduce errors such as allelic dropouts and imbalance in ampli
 
 ## Contents
 
-  1. [Pre-requisites](#pre-requisites)
+  1. [Installation](#install)
+     * [Using conda](#conda)(recommended)
+     * [Using pip](#compilation) (alternative)
+          * [Dependencies](#pre-requisites)
+          * [install using pip](#install)
   2. [Usage instructions](#usage)
      * [I/O formats](#io)
      * [doubletD](#doubletD)
-     * [simulation](#simulation)
+
+<a name="install"></a>
+
+## Installation
+ 
+<a name="conda"></a>
+  ```bash
+  $ conda install -c bioconda doubletd
+   ```
+
+### Using pip (alternative)
 
 <a name="pre-requisites"></a>
 ## Pre-requisites
 + python3 (>=3.6)
++ setuptools
 + [numpy](https://numpy.org/doc/)
 + [pandas](https://pandas.pydata.org/pandas-docs/stable/index.html)
 
+<a name="install"></a>
+  1. Clone the repository
+    ```bash
+    $ git clone https://github.com/elkebir-group/doubletD.git
+    ```
+  2. Install doubletD using pip
+    Clone the repository
+    ```bash
+    $ cd doubletd
+    $ pip install ./
+    ```
 <a name="usage"></a>
 ## Usage instructions
 
@@ -37,7 +66,7 @@ See `data/sample_prediction.tsv` for an example.
 
 Parameters with default value `None` are estimated from data
 
-    usage: doubletD.py [-h] [--inputTotal INPUTTOTAL]
+    usage: doubletd [-h] [--inputTotal INPUTTOTAL]
                    [--inputAlternate INPUTALTERNATE] [--delta DELTA]
                    [--beta BETA] [--mu_hetero MU_HETERO] [--mu_hom MU_HOM]
                    [--alpha_fp ALPHA_FP] [--alpha_fn ALPHA_FN] [-o OUTPUTFILE]
@@ -74,6 +103,6 @@ Here we will show an example of how to run `doubletD`.
 The input files are located in the `example` directory.
 We run `doubletD` with a prior doublet probabiltity of 0.2 and ADO rate of 0.05 without using missing data in our model.
 
-    $ python scripts/doubletD.py --inputAlternate example/AD.csv --inputTotal example/DP.csv --delta 0.2 --beta 0.05 -o example/prediction.tsv 
+    $ doubletd --inputAlternate example/AD.csv --inputTotal example/DP.csv --delta 0.2 --beta 0.05 -o example/prediction.tsv 
 
 This command generates output file `prediction.tsv` in directory `example`.
